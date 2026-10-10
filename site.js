@@ -5,6 +5,12 @@
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var TJ = window.TJ = {};
 
+  // ---- El agua siempre ocupa toda su sección: si la sección cambia de tamaño (letras, directo...), el lienzo crece con ella y no deja bordes rectos
+  if (window.jQuery && jQuery.fn.ripples && jQuery.fn.ripples.Constructor) {
+    var RP = jQuery.fn.ripples.Constructor.prototype, step = RP.step;
+    RP.step = function () { if (this.visible) this.updateSize(); return step.call(this); };
+  }
+
   var y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 

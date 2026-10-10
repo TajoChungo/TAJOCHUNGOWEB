@@ -111,6 +111,8 @@ h1 {
 .frame { position: relative; aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden; background: #000; border-radius: var(--r); }
 .frame video, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
 .frame .player { position: absolute; inset: 0; }
+/* En Kick se recortan sus propios botones (arriba y abajo) para que solo se vean los míos; el vídeo sigue ocupando todo */
+.frame .player.kick iframe { top: -60px; bottom: auto; height: calc(100% + 120px); }
 .frame-top { position: absolute; left: 10px; top: 10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 /* Controles propios del directo de Kick, copiando los de Kick: abajo, aparecen al mover el ratón y se van juntos */
 .shield { position: absolute; inset: 0; z-index: 1; cursor: pointer; }
@@ -120,18 +122,13 @@ h1 {
   background: linear-gradient(180deg, transparent, rgba(0,0,0,0.6)); color: #fff; font: 700 13px/1 var(--f-body); font-variant-numeric: tabular-nums;
   opacity: 0; pointer-events: none; transition: opacity .25s; }
 .frame.ui .kbar, .kbar:focus-within { opacity: 1; pointer-events: auto; }
-.kb-viewers, .kb-time, .sound { display: inline-flex; align-items: center; gap: 6px; height: 20px; }
+.kb-viewers, .kb-time, .kb-sound { display: inline-flex; align-items: center; gap: 6px; height: 20px; }
 .kb-viewers { color: #53fc18; } .kb-viewers svg { width: 16px; height: 16px; fill: currentColor; }
 .kb-time i { width: 6px; height: 6px; border-radius: 50%; background: #53fc18; }
-.sound { --sc: #53fc18; margin-left: 2px; }
-.sound-btn, .kb-full { display: inline-flex; align-items: center; padding: 0; border: 0; background: none; cursor: pointer; }
-.sound-btn { color: var(--sc); } .sound-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.kb-sound { gap: 6px; padding: 0 9px; height: 24px; border-radius: 4px; color: #53fc18; text-decoration: none; background: rgba(83,252,24,0.12); border: 1px solid rgba(83,252,24,0.45); transition: background .2s, color .2s; }
+.kb-sound svg { width: 15px; height: 15px; fill: currentColor; }
+.kb-sound:hover { background: #53fc18; color: #081113; }
 .kb-full { margin-left: auto; color: #fff; } .kb-full svg { width: 20px; height: 20px; }
-.sound .s-off { display: none; } .sound.muted .s-off { display: inline; } .sound.muted .s-on { display: none; }
-.sound input[type=range] { --fill: 0%; -webkit-appearance: none; appearance: none; width: 72px; height: 3px; margin: 0; border-radius: 99px; cursor: pointer;
-  background: linear-gradient(90deg, var(--sc) var(--fill), rgba(255,255,255,0.3) var(--fill)); }
-.sound input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--sc); border: 0; }
-.sound input[type=range]::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--sc); border: 0; }
 .frame:fullscreen { aspect-ratio: auto; border-radius: 0; }
 
 .frame-label {
@@ -415,3 +412,5 @@ header.top { view-transition-name: cabecera; }
 @keyframes vt-out { to { opacity: 0; } }
 @keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }
+/* El lienzo del agua siempre cubre su sección entera */
+.jquery-ripples > canvas { width: 100% !important; height: 100% !important; }
