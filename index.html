@@ -251,7 +251,7 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
   if (!window.jQuery || !jQuery.fn.ripples) return;
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var $s = jQuery("#sea"), sea = document.getElementById("sea");
-  try { $s.ripples({ resolution: 320, dropRadius: 20, perturbance: 0.03, interactive: false }); } catch (e) { return; }
+  try { $s.ripples({ resolution: 768, dropRadius: 20, perturbance: 0.03, interactive: false }); } catch (e) { return; }
   window.TJ && TJ.pauseOffscreen($s, sea);
   var last = 0;
   function dropAt(x, y, r, s) { var b = sea.getBoundingClientRect(); $s.ripples("drop", x - b.left, y - b.top, r, s); }
