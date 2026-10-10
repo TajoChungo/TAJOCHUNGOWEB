@@ -87,11 +87,15 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
           <div class="frame-top">
             <span class="frame-label" id="frame-label">Ahora no estoy en directo</span>
           </div>
-          <div class="sound" id="sound" hidden>
-            <button type="button" class="sound-btn" id="sound-btn" aria-label="Activar sonido">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path class="s-on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="s-off" d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-            <input type="range" id="sound-vol" min="0" max="100" value="50" autocomplete="off" aria-label="Volumen">
+          <div class="shield" id="shield" hidden></div>
+          <div class="kbar" id="kbar" hidden>
+            <span class="kb-viewers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0v1H2v-1Zm15.5-9a3.5 3.5 0 1 0-1.4-6.7 5.9 5.9 0 0 1 0 6.4 3.5 3.5 0 0 0 1.4.3ZM18 21h4v-1a6 6 0 0 0-4.2-5.7A8.9 8.9 0 0 1 18 20v1Z"/></svg><b id="kb-count">0</b></span>
+            <span class="kb-time"><i></i><b id="kb-time">00:00:00</b></span>
+            <span class="sound muted" id="sound">
+              <button type="button" class="sound-btn" id="sound-btn" aria-label="Activar sonido"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path class="s-on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="s-off" d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+              <input type="range" id="sound-vol" min="0" max="100" value="50" autocomplete="off" aria-label="Volumen">
+            </span>
+            <button type="button" class="kb-full" id="kb-full" aria-label="Pantalla completa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
         </div>
         <div class="channels">
@@ -189,59 +193,69 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
     document.getElementById(card).classList.toggle("is-live", !!live);
   }
   var top = frame.querySelector(".frame-top");
+  var shield = document.getElementById("shield"), kbar = document.getElementById("kbar");
   var sound = document.getElementById("sound"), sbtn = document.getElementById("sound-btn");
-  var svol = document.getElementById("sound-vol");
-  var twPlayer = null, kickMuted = true, host = location.hostname || "tajochungo.com";
-  function paintSound(muted) {
-    sound.classList.toggle("muted", muted);
-    sbtn.setAttribute("aria-label", muted ? "Activar sonido" : "Silenciar");
-    svol.style.setProperty("--fill", svol.value + "%");
-  }
-  function loadTwitch(cb) {
-    if (window.Twitch && Twitch.Player) return cb(true);
-    var sc = document.createElement("script");
-    sc.src = "https://player.twitch.tv/js/embed/v1.js";
-    sc.onload = function () { cb(!!(window.Twitch && Twitch.Player)); };
-    sc.onerror = function () { cb(false); };
-    document.head.appendChild(sc);
-  }
+  var svol = document.getElementById("sound-vol"), kbCount = document.getElementById("kb-count"), kbTime = document.getElementById("kb-time");
+  var host = location.hostname || "tajochungo.com", kickMuted = true, kickStart = null, uiTimer = null;
   function plainIframe(box, src) {
     var f = document.createElement("iframe");
     f.src = src; f.allowFullscreen = true; f.setAttribute("allow", "autoplay; fullscreen");
     box.appendChild(f); return f;
   }
   function kickSrc() { return "https://player.kick.com/elmuelle?muted=" + kickMuted + "&autoplay=true"; }
-  function setKick(muted) {
-    if (muted === kickMuted) { paintSound(muted); return; }
-    kickMuted = muted;
-    var f = frame.querySelector(".player iframe"); if (f) f.src = kickSrc();
-    paintSound(muted);
+  // Controles propios en Kick: aparecen al mover el ratón y se van todos juntos a los 3 s, como los de Kick
+  function wake() {
+    frame.classList.add("ui");
+    clearTimeout(uiTimer);
+    uiTimer = setTimeout(function () { if (!kbar.matches(":hover") && !kbar.contains(document.activeElement)) frame.classList.remove("ui"); else wake(); }, 3000);
   }
-  sbtn.addEventListener("click", function () {
-    var muted = sound.classList.contains("muted");
-    if (muted && Number(svol.value) === 0) svol.value = 50;
-    if (current === "twitch" && twPlayer) {
-      twPlayer.setVolume(Number(svol.value) / 100); twPlayer.setMuted(!muted); paintSound(!muted);
-    } else if (current === "kick") setKick(!muted);
-  });
-  svol.addEventListener("input", function () {
-    var v = Number(svol.value) / 100;
-    svol.style.setProperty("--fill", svol.value + "%");
-    if (current === "twitch" && twPlayer) { twPlayer.setVolume(v); twPlayer.setMuted(v === 0); paintSound(v === 0); }
-  });
-  svol.addEventListener("change", function () {
-    if (current === "kick") setKick(Number(svol.value) === 0);
-  });
+  function sleep() { clearTimeout(uiTimer); frame.classList.remove("ui"); }
+  shield.addEventListener("pointermove", wake);
+  kbar.addEventListener("pointermove", wake);
+  shield.addEventListener("pointerleave", function (e) { if (!kbar.contains(e.relatedTarget)) sleep(); });
+  kbar.addEventListener("pointerleave", function (e) { if (e.relatedTarget !== shield) sleep(); });
+  shield.addEventListener("click", function () { wake(); setKick(!kickMuted); });
+  shield.addEventListener("dblclick", fullscreen);
+  function fullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (frame.requestFullscreen) frame.requestFullscreen();
+  }
+  document.getElementById("kb-full").addEventListener("click", fullscreen);
+  function paintSound() {
+    sound.classList.toggle("muted", kickMuted);
+    sbtn.setAttribute("aria-label", kickMuted ? "Activar sonido" : "Silenciar");
+    svol.style.setProperty("--fill", (kickMuted ? 0 : svol.value) + "%");
+  }
+  function setKick(muted) {
+    if (muted === kickMuted) { paintSound(); return; }
+    kickMuted = muted;
+    if (!muted && Number(svol.value) === 0) svol.value = 50;
+    var f = frame.querySelector(".player iframe"); if (f) f.src = kickSrc();
+    paintSound();
+  }
+  sbtn.addEventListener("click", function () { setKick(!kickMuted); });
+  svol.addEventListener("input", function () { svol.style.setProperty("--fill", svol.value + "%"); });
+  svol.addEventListener("change", function () { setKick(Number(svol.value) === 0); });
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  setInterval(function () {
+    if (!kickStart) return;
+    var t = Math.max(0, Math.floor((Date.now() - kickStart) / 1000));
+    kbTime.textContent = pad(Math.floor(t / 3600)) + ":" + pad(Math.floor(t / 60) % 60) + ":" + pad(t % 60);
+  }, 1000);
+  function kickInfo(j) {
+    var l = j && j.livestream; if (!l) return;
+    if (l.viewer_count != null) kbCount.textContent = l.viewer_count;
+    var st = l.start_time || l.created_at;
+    if (st) { var d = Date.parse(st.replace(" ", "T") + "Z"); if (!isNaN(d)) kickStart = d; }
+  }
   function show(which) {
     if (which === current) return;
     current = which;
     var old = frame.querySelector(".player");
     if (old) old.remove();
-    twPlayer = null; kickMuted = true;
+    kickMuted = true; sleep(); paintSound();
     screen.classList.toggle("is-live", !!which);
-    sound.hidden = !which;
-    sound.className = "sound muted " + (which === "twitch" ? "tw" : "kk");
-    paintSound(true);
+    shield.hidden = kbar.hidden = which !== "kick";
     if (!which) {
       video.hidden = false; try { video.play(); } catch (e) {}
       label.className = "frame-label"; label.textContent = "Ahora no estoy en directo";
@@ -251,21 +265,9 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
     box.className = "player";
     box.title = which === "twitch" ? "Directo de Tajochungo en Twitch" : "Directo de ElMuelle en Kick";
     frame.insertBefore(box, top);
-    if (which === "twitch") {
-      box.id = "tw-player";
-      loadTwitch(function (ok) {
-        if (current !== "twitch" || !box.isConnected) return;
-        if (ok) {
-          twPlayer = new Twitch.Player("tw-player", { channel: "tajochungo", parent: [host, "tajochungo.com", "www.tajochungo.com"], muted: true, autoplay: true, width: "100%", height: "100%" });
-          twPlayer.setVolume(Number(svol.value) / 100);
-        } else {
-          plainIframe(box, "https://player.twitch.tv/?channel=tajochungo&parent=" + host + "&parent=tajochungo.com&parent=www.tajochungo.com&muted=true&autoplay=true");
-          sound.hidden = true;
-        }
-      });
-    } else {
-      plainIframe(box, kickSrc());
-    }
+    plainIframe(box, which === "twitch"
+      ? "https://player.twitch.tv/?channel=tajochungo&parent=" + host + "&parent=tajochungo.com&parent=www.tajochungo.com&muted=true&autoplay=true"
+      : kickSrc());
     video.hidden = true; try { video.pause(); } catch (e) {}
     label.className = "frame-label on"; label.textContent = which === "twitch" ? "En directo en Twitch" : "En directo en Kick";
   }
@@ -273,7 +275,7 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
     var tw = Promise.race([fetch("https://decapi.me/twitch/uptime/tajochungo").then(function (r) { return r.text(); }), timeout(6000)])
       .then(function (t) { return !/offline|error|not found|could not/i.test(t); }).catch(function () { return false; });
     var kk = Promise.race([fetch("https://kick.com/api/v2/channels/elmuelle").then(function (r) { if (!r.ok) throw 0; return r.json(); }), timeout(6000)])
-      .then(function (j) { return !!(j && j.livestream && j.livestream.is_live !== false); }).catch(function () { return false; });
+      .then(function (j) { var on = !!(j && j.livestream && j.livestream.is_live !== false); if (on) kickInfo(j); return on; }).catch(function () { return false; });
     Promise.all([tw, kk]).then(function (r) {
       setPill("tw-state", "tw-card", r[0]); setPill("kk-state", "kk-card", r[1]);
       show(r[0] ? "twitch" : (r[1] ? "kick" : null));
