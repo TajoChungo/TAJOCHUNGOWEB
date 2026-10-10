@@ -409,3 +409,8 @@ html.intro.go .intro-item { opacity: 1; transform: none; transition: opacity 1s 
 html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
 html.js .reveal.seen { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1; transform: none; transition: none; } }
+/* Secciones en obras: el barril da vueltas mientras flota */
+.wip-bob { display: block; width: 200px; margin-bottom: 14px; animation: bob 4.2s ease-in-out infinite; }
+.wip-barrel { display: block; width: 100%; height: auto; filter: drop-shadow(0 14px 20px rgba(0,0,0,0.6)); animation: wipSpin 7s linear infinite; }
+@keyframes wipSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .wip-bob, .wip-barrel { animation: none; } }
