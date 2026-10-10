@@ -84,7 +84,16 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
       <div class="screen intro-item" style="--i:0" id="screen" aria-live="polite">
         <div class="frame" id="frame">
           <video id="offline-video" src="media/offline.mp4" poster="media/offline-poster.webp" autoplay muted loop playsinline></video>
-          <span class="frame-label" id="frame-label">Ahora no estoy en directo</span>
+          <div class="frame-top">
+            <span class="frame-label" id="frame-label">Ahora no estoy en directo</span>
+            <div class="sound" id="sound" hidden>
+              <button type="button" class="sound-btn" id="sound-btn" aria-label="Activar sonido">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path class="s-on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="s-off" d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="sound-txt" id="sound-txt">Activar sonido</span>
+              </button>
+              <input type="range" id="sound-vol" min="0" max="100" value="50" aria-label="Volumen">
+            </div>
+          </div>
         </div>
         <div class="channels">
           <a class="chan" id="tw-card" href="https://www.twitch.tv/tajochungo" target="_blank" rel="noopener">
@@ -180,25 +189,80 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
     el.textContent = live ? "En directo" : "Offline";
     document.getElementById(card).classList.toggle("is-live", !!live);
   }
+  var top = frame.querySelector(".frame-top");
+  var sound = document.getElementById("sound"), sbtn = document.getElementById("sound-btn");
+  var stxt = document.getElementById("sound-txt"), svol = document.getElementById("sound-vol");
+  var twPlayer = null, kickMuted = true, host = location.hostname || "tajochungo.com";
+  function paintSound(muted) {
+    sound.classList.toggle("muted", muted);
+    stxt.textContent = muted ? "Activar sonido" : "Silenciar";
+    sbtn.setAttribute("aria-label", stxt.textContent);
+  }
+  function loadTwitch(cb) {
+    if (window.Twitch && Twitch.Player) return cb(true);
+    var sc = document.createElement("script");
+    sc.src = "https://player.twitch.tv/js/embed/v1.js";
+    sc.onload = function () { cb(!!(window.Twitch && Twitch.Player)); };
+    sc.onerror = function () { cb(false); };
+    document.head.appendChild(sc);
+  }
+  function plainIframe(box, src) {
+    var f = document.createElement("iframe");
+    f.src = src; f.allowFullscreen = true; f.setAttribute("allow", "autoplay; fullscreen");
+    box.appendChild(f); return f;
+  }
+  function kickSrc() { return "https://player.kick.com/elmuelle?muted=" + kickMuted + "&autoplay=true"; }
+  sbtn.addEventListener("click", function () {
+    if (current === "twitch" && twPlayer) {
+      var m = !twPlayer.getMuted();
+      if (!m && Number(svol.value) === 0) { svol.value = 50; twPlayer.setVolume(0.5); }
+      twPlayer.setMuted(m); paintSound(m);
+    } else if (current === "kick") {
+      kickMuted = !kickMuted;
+      var f = frame.querySelector(".player iframe"); if (f) f.src = kickSrc();
+      paintSound(kickMuted);
+    }
+  });
+  svol.addEventListener("input", function () {
+    if (current !== "twitch" || !twPlayer) return;
+    var v = Number(svol.value) / 100;
+    twPlayer.setVolume(v); twPlayer.setMuted(v === 0); paintSound(v === 0);
+    svol.style.setProperty("--fill", svol.value + "%");
+  });
   function show(which) {
     if (which === current) return;
     current = which;
-    var old = frame.querySelector("iframe");
+    var old = frame.querySelector(".player");
     if (old) old.remove();
+    twPlayer = null; kickMuted = true;
     screen.classList.toggle("is-live", !!which);
+    sound.hidden = !which;
+    sound.className = "sound muted " + (which === "twitch" ? "tw" : "kk");
+    paintSound(true);
     if (!which) {
       video.hidden = false; try { video.play(); } catch (e) {}
       label.className = "frame-label"; label.textContent = "Ahora no estoy en directo";
       return;
     }
-    var host = location.hostname || "tajochungo.com";
-    var src = which === "twitch"
-      ? "https://player.twitch.tv/?channel=tajochungo&parent=" + host + "&parent=tajochungo.com&parent=www.tajochungo.com&muted=true&autoplay=true"
-      : "https://player.kick.com/elmuelle?muted=true&autoplay=true";
-    var f = document.createElement("iframe");
-    f.src = src; f.allowFullscreen = true; f.setAttribute("allow", "autoplay; fullscreen");
-    f.title = which === "twitch" ? "Directo de Tajochungo en Twitch" : "Directo de ElMuelle en Kick";
-    frame.insertBefore(f, label);
+    var box = document.createElement("div");
+    box.className = "player";
+    box.title = which === "twitch" ? "Directo de Tajochungo en Twitch" : "Directo de ElMuelle en Kick";
+    frame.insertBefore(box, top);
+    if (which === "twitch") {
+      box.id = "tw-player";
+      loadTwitch(function (ok) {
+        if (current !== "twitch" || !box.isConnected) return;
+        if (ok) {
+          twPlayer = new Twitch.Player("tw-player", { channel: "tajochungo", parent: [host, "tajochungo.com", "www.tajochungo.com"], muted: true, autoplay: true, width: "100%", height: "100%" });
+          twPlayer.setVolume(Number(svol.value) / 100);
+        } else {
+          plainIframe(box, "https://player.twitch.tv/?channel=tajochungo&parent=" + host + "&parent=tajochungo.com&parent=www.tajochungo.com&muted=true&autoplay=true");
+          sound.hidden = true;
+        }
+      });
+    } else {
+      plainIframe(box, kickSrc());
+    }
     video.hidden = true; try { video.pause(); } catch (e) {}
     label.className = "frame-label on"; label.textContent = which === "twitch" ? "En directo en Twitch" : "En directo en Kick";
   }
