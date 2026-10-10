@@ -110,8 +110,32 @@ h1 {
 .screen.is-live { border-color: var(--live); box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 20px 60px rgba(0,0,0,0.55), 0 0 60px rgba(255,79,79,0.3); }
 .frame { position: relative; aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden; background: #000; border-radius: var(--r); }
 .frame video, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
+.frame .player { position: absolute; inset: 0; }
+.frame-top { position: absolute; left: 10px; top: 10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+/* Controles propios del directo de Kick, copiando los de Kick: abajo, aparecen al mover el ratón y se van juntos */
+.shield { position: absolute; inset: 0; z-index: 1; cursor: pointer; }
+.shield[hidden], .kbar[hidden] { display: none; }
+.frame.ui .shield { cursor: default; }
+.kbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; height: 48px; padding: 0 14px; display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.6)); color: #fff; font: 700 13px/1 var(--f-body); font-variant-numeric: tabular-nums;
+  opacity: 0; pointer-events: none; transition: opacity .25s; }
+.frame.ui .kbar, .kbar:focus-within { opacity: 1; pointer-events: auto; }
+.kb-viewers, .kb-time, .sound { display: inline-flex; align-items: center; gap: 6px; height: 20px; }
+.kb-viewers { color: #53fc18; } .kb-viewers svg { width: 16px; height: 16px; fill: currentColor; }
+.kb-time i { width: 6px; height: 6px; border-radius: 50%; background: #53fc18; }
+.sound { --sc: #53fc18; margin-left: 2px; }
+.sound-btn, .kb-full { display: inline-flex; align-items: center; padding: 0; border: 0; background: none; cursor: pointer; }
+.sound-btn { color: var(--sc); } .sound-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.kb-full { margin-left: auto; color: #fff; } .kb-full svg { width: 20px; height: 20px; }
+.sound .s-off { display: none; } .sound.muted .s-off { display: inline; } .sound.muted .s-on { display: none; }
+.sound input[type=range] { --fill: 0%; -webkit-appearance: none; appearance: none; width: 72px; height: 3px; margin: 0; border-radius: 99px; cursor: pointer;
+  background: linear-gradient(90deg, var(--sc) var(--fill), rgba(255,255,255,0.3) var(--fill)); }
+.sound input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--sc); border: 0; }
+.sound input[type=range]::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--sc); border: 0; }
+.frame:fullscreen { aspect-ratio: auto; border-radius: 0; }
+
 .frame-label {
-  position: absolute; left: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 8px;
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
   font-family: var(--f-label); font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; font-size: 13px;
   padding: 6px 10px; background: rgba(8,17,19,0.78); border: 1px solid var(--line); border-radius: var(--r); color: var(--ink);
   backdrop-filter: blur(4px); pointer-events: none;
@@ -147,7 +171,7 @@ h1 {
 section.block { padding-block: 72px; position: relative; z-index: 2; }
 .head { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
 .head h2, h2.title { font-family: var(--f-display); font-weight: 400; font-size: clamp(38px, 5vw, 56px); line-height: 1; margin: 0; text-wrap: balance; }
-.head h2.h-orange, h2.title.h-orange { color: var(--orange); text-shadow: 0 0 6px rgba(240,138,44,0.9), 0 0 22px rgba(240,138,44,0.6), 0 0 60px rgba(240,138,44,0.35); }
+.head h2.h-orange, h2.title.h-orange, .prose h3.h-orange { color: var(--orange); text-shadow: 0 0 6px rgba(240,138,44,0.9), 0 0 22px rgba(240,138,44,0.6), 0 0 60px rgba(240,138,44,0.35); }
 .head p { margin: 0; color: var(--mute); max-width: 34em; }
 .eyebrow { font-family: var(--f-label); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; font-size: 14px; color: var(--glow); margin: 0 0 8px; }
 
@@ -192,13 +216,6 @@ section.block { padding-block: 72px; position: relative; z-index: 2; }
 .sea::before { top: 0; background: linear-gradient(180deg, var(--hold), transparent); }
 .sea::after { bottom: 0; background: linear-gradient(0deg, var(--hold), transparent); }
 .sea > .wrap { position: relative; z-index: 2; }
-
-/* Transición entre páginas */
-.veil { position: fixed; inset: 0; z-index: 80; background: var(--hold); pointer-events: none; opacity: 1; transition: opacity .45s ease; }
-html.arrived .veil { opacity: 0; }
-html.leaving .veil { opacity: 1; transition-duration: .35s; }
-html.intro .veil { display: none; }
-@media (prefers-reduced-motion: reduce) { .veil { display: none; } }
 
 /* Aviso de directo en las secciones */
 .live-pill {
@@ -385,3 +402,16 @@ html.intro.go .intro-item { opacity: 1; transform: none; transition: opacity 1s 
 html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
 html.js .reveal.seen { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1; transform: none; transition: none; } }
+/* Secciones en obras: el barril da vueltas mientras flota */
+.wip-bob { display: block; width: 200px; margin-bottom: 14px; animation: bob 4.2s ease-in-out infinite; }
+.wip-barrel { display: block; width: 100%; height: auto; filter: drop-shadow(0 14px 20px rgba(0,0,0,0.6)); animation: wipSpin 7s linear infinite; }
+@keyframes wipSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .wip-bob, .wip-barrel { animation: none; } }
+/* Cambio de sección: fundido nativo del navegador, sin esperas ni pantallazo; la cabecera se queda quieta */
+@view-transition { navigation: auto; }
+header.top { view-transition-name: cabecera; }
+::view-transition-old(root) { animation: vt-out .18s ease-in both; }
+::view-transition-new(root) { animation: vt-in .26s ease-out both; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }
