@@ -128,7 +128,7 @@ h1 {
 .kb-sound { gap: 6px; padding: 0 9px; height: 24px; border-radius: 4px; color: #53fc18; text-decoration: none; background: rgba(83,252,24,0.12); border: 1px solid rgba(83,252,24,0.45); transition: background .2s, color .2s; }
 .kb-sound svg { width: 15px; height: 15px; fill: currentColor; }
 .kb-sound:hover { background: #53fc18; color: #081113; }
-.kb-full { margin-left: auto; color: #fff; } .kb-full svg { width: 20px; height: 20px; }
+.kb-full { display: inline-flex; align-items: center; padding: 0; border: 0; background: none; cursor: pointer; margin-left: auto; color: #fff; opacity: .9; } .kb-full:hover { opacity: 1; } .kb-full svg { width: 20px; height: 20px; }
 .frame:fullscreen { aspect-ratio: auto; border-radius: 0; }
 
 .frame-label {
