@@ -112,20 +112,18 @@ h1 {
 .frame video, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
 .frame .player { position: absolute; inset: 0; }
 .frame-top { position: absolute; left: 10px; top: 10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-/* Sonido: verde Kick o morado Twitch */
-.sound { --sc: #53fc18; display: inline-flex; align-items: center; gap: 10px; padding: 5px 10px; background: rgba(8,17,19,0.78); border: 1px solid color-mix(in srgb, var(--sc) 55%, transparent); border-radius: var(--r); backdrop-filter: blur(4px); box-shadow: 0 0 12px color-mix(in srgb, var(--sc) 30%, transparent); }
-.sound.tw { --sc: #a970ff; }
+/* Sonido: barra junto a los espectadores, verde Kick o morado Twitch */
+.sound { --sc: #53fc18; position: absolute; left: 118px; bottom: 13px; z-index: 2; display: inline-flex; align-items: center; gap: 8px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+.sound.tw { --sc: #a970ff; left: 12px; bottom: 54px; }
 .sound[hidden] { display: none; }
-.sound-btn { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: none; color: var(--sc); cursor: pointer; font-family: var(--f-label); font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; }
-.sound-btn svg { width: 18px; height: 18px; fill: currentColor; filter: drop-shadow(0 0 4px color-mix(in srgb, var(--sc) 70%, transparent)); }
+.sound-btn { display: inline-flex; padding: 0; border: 0; background: none; color: var(--sc); cursor: pointer; }
+.sound-btn svg { width: 22px; height: 22px; fill: currentColor; }
 .sound .s-off { display: none; } .sound.muted .s-off { display: inline; } .sound.muted .s-on { display: none; }
-.sound.kk input { display: none; }
-.sound.tw .sound-txt { display: none; }
-.sound input[type=range] { --fill: 50%; -webkit-appearance: none; appearance: none; width: 110px; height: 5px; border-radius: 99px; cursor: pointer;
-  background: linear-gradient(90deg, var(--sc) var(--fill), rgba(255,255,255,0.18) var(--fill)); }
-.sound.muted input[type=range] { opacity: 0.55; }
-.sound input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--sc); box-shadow: 0 0 8px var(--sc); border: 0; }
-.sound input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: var(--sc); box-shadow: 0 0 8px var(--sc); border: 0; }
+.sound input[type=range] { --fill: 50%; -webkit-appearance: none; appearance: none; width: 120px; height: 4px; margin: 0; border-radius: 99px; cursor: pointer;
+  background: linear-gradient(90deg, var(--sc) var(--fill), rgba(255,255,255,0.35) var(--fill)); }
+.sound.muted input[type=range] { background: rgba(255,255,255,0.35); }
+.sound input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--sc); border: 0; }
+.sound input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--sc); border: 0; }
 
 .frame-label {
   position: relative; display: inline-flex; align-items: center; gap: 8px;

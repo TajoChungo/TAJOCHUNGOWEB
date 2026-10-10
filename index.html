@@ -86,13 +86,12 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
           <video id="offline-video" src="media/offline.mp4" poster="media/offline-poster.webp" autoplay muted loop playsinline></video>
           <div class="frame-top">
             <span class="frame-label" id="frame-label">Ahora no estoy en directo</span>
-            <div class="sound" id="sound" hidden>
-              <button type="button" class="sound-btn" id="sound-btn" aria-label="Activar sonido">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path class="s-on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="s-off" d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                <span class="sound-txt" id="sound-txt">Activar sonido</span>
-              </button>
-              <input type="range" id="sound-vol" min="0" max="100" value="50" aria-label="Volumen">
-            </div>
+          </div>
+          <div class="sound" id="sound" hidden>
+            <button type="button" class="sound-btn" id="sound-btn" aria-label="Activar sonido">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path class="s-on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="s-off" d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <input type="range" id="sound-vol" min="0" max="100" value="50" aria-label="Volumen">
           </div>
         </div>
         <div class="channels">
@@ -191,12 +190,12 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
   }
   var top = frame.querySelector(".frame-top");
   var sound = document.getElementById("sound"), sbtn = document.getElementById("sound-btn");
-  var stxt = document.getElementById("sound-txt"), svol = document.getElementById("sound-vol");
+  var svol = document.getElementById("sound-vol");
   var twPlayer = null, kickMuted = true, host = location.hostname || "tajochungo.com";
   function paintSound(muted) {
     sound.classList.toggle("muted", muted);
-    stxt.textContent = muted ? "Activar sonido" : "Silenciar";
-    sbtn.setAttribute("aria-label", stxt.textContent);
+    sbtn.setAttribute("aria-label", muted ? "Activar sonido" : "Silenciar");
+    svol.style.setProperty("--fill", svol.value + "%");
   }
   function loadTwitch(cb) {
     if (window.Twitch && Twitch.Player) return cb(true);
@@ -212,22 +211,26 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
     box.appendChild(f); return f;
   }
   function kickSrc() { return "https://player.kick.com/elmuelle?muted=" + kickMuted + "&autoplay=true"; }
+  function setKick(muted) {
+    if (muted === kickMuted) { paintSound(muted); return; }
+    kickMuted = muted;
+    var f = frame.querySelector(".player iframe"); if (f) f.src = kickSrc();
+    paintSound(muted);
+  }
   sbtn.addEventListener("click", function () {
+    var muted = sound.classList.contains("muted");
+    if (muted && Number(svol.value) === 0) svol.value = 50;
     if (current === "twitch" && twPlayer) {
-      var m = !twPlayer.getMuted();
-      if (!m && Number(svol.value) === 0) { svol.value = 50; twPlayer.setVolume(0.5); }
-      twPlayer.setMuted(m); paintSound(m);
-    } else if (current === "kick") {
-      kickMuted = !kickMuted;
-      var f = frame.querySelector(".player iframe"); if (f) f.src = kickSrc();
-      paintSound(kickMuted);
-    }
+      twPlayer.setVolume(Number(svol.value) / 100); twPlayer.setMuted(!muted); paintSound(!muted);
+    } else if (current === "kick") setKick(!muted);
   });
   svol.addEventListener("input", function () {
-    if (current !== "twitch" || !twPlayer) return;
     var v = Number(svol.value) / 100;
-    twPlayer.setVolume(v); twPlayer.setMuted(v === 0); paintSound(v === 0);
     svol.style.setProperty("--fill", svol.value + "%");
+    if (current === "twitch" && twPlayer) { twPlayer.setVolume(v); twPlayer.setMuted(v === 0); paintSound(v === 0); }
+  });
+  svol.addEventListener("change", function () {
+    if (current === "kick") setKick(Number(svol.value) === 0);
   });
   function show(which) {
     if (which === current) return;
