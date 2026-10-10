@@ -217,13 +217,6 @@ section.block { padding-block: 72px; position: relative; z-index: 2; }
 .sea::after { bottom: 0; background: linear-gradient(0deg, var(--hold), transparent); }
 .sea > .wrap { position: relative; z-index: 2; }
 
-/* Transición entre páginas */
-.veil { position: fixed; inset: 0; z-index: 80; background: var(--hold); pointer-events: none; opacity: 1; transition: opacity .45s ease; }
-html.arrived .veil { opacity: 0; }
-html.leaving .veil { opacity: 1; transition-duration: .35s; }
-html.intro .veil { display: none; }
-@media (prefers-reduced-motion: reduce) { .veil { display: none; } }
-
 /* Aviso de directo en las secciones */
 .live-pill {
   position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 70;
@@ -414,3 +407,11 @@ html.js .reveal.seen { opacity: 1; transform: none; }
 .wip-barrel { display: block; width: 100%; height: auto; filter: drop-shadow(0 14px 20px rgba(0,0,0,0.6)); animation: wipSpin 7s linear infinite; }
 @keyframes wipSpin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .wip-bob, .wip-barrel { animation: none; } }
+/* Cambio de sección: fundido nativo del navegador, sin esperas ni pantallazo; la cabecera se queda quieta */
+@view-transition { navigation: auto; }
+header.top { view-transition-name: cabecera; }
+::view-transition-old(root) { animation: vt-out .18s ease-in both; }
+::view-transition-new(root) { animation: vt-in .26s ease-out both; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }

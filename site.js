@@ -30,23 +30,6 @@
     } catch (e) {}
   }
 
-  // ---- Transición suave entre páginas
-  var veil = document.createElement("div");
-  veil.className = "veil"; veil.setAttribute("aria-hidden", "true");
-  document.body.appendChild(veil);
-  requestAnimationFrame(function () { root.classList.add("arrived"); });
-  window.addEventListener("pageshow", function (e) { if (e.persisted) root.classList.remove("leaving"); });
-  document.addEventListener("click", function (e) {
-    var a = e.target.closest && e.target.closest("a[href]");
-    if (!a || reduce || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-    if (a.target === "_blank" || a.hasAttribute("download")) return;
-    var url = new URL(a.href, location.href);
-    if (url.origin !== location.origin || url.pathname === location.pathname) return;
-    e.preventDefault();
-    root.classList.add("leaving");
-    setTimeout(function () { location.href = a.href; }, 380);
-  });
-
   // ---- Datos en vivo
   function timeout(ms) { return new Promise(function (_, rej) { setTimeout(function () { rej(new Error("timeout")); }, ms); }); }
   function get(url, json) {
