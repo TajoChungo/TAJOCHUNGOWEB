@@ -112,18 +112,20 @@ h1 {
 .frame video, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
 .frame .player { position: absolute; inset: 0; }
 .frame-top { position: absolute; left: 10px; top: 10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-/* Sonido: barra junto a los espectadores, verde Kick o morado Twitch */
-.sound { --sc: #53fc18; position: absolute; left: 118px; bottom: 13px; z-index: 2; display: inline-flex; align-items: center; gap: 8px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+/* Sonido: barra discreta junto a los espectadores, verde Kick o morado Twitch; aparece y se va con los controles */
+.sound { --sc: #53fc18; position: absolute; left: 116px; bottom: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 6px;
+  opacity: 0; pointer-events: none; transition: opacity .25s; }
+.frame:hover .sound, .sound:focus-within { opacity: 1; pointer-events: auto; }
 .sound.tw { --sc: #a970ff; left: 12px; bottom: 54px; }
 .sound[hidden] { display: none; }
 .sound-btn { display: inline-flex; padding: 0; border: 0; background: none; color: var(--sc); cursor: pointer; }
-.sound-btn svg { width: 22px; height: 22px; fill: currentColor; }
+.sound-btn svg { width: 17px; height: 17px; fill: currentColor; }
 .sound .s-off { display: none; } .sound.muted .s-off { display: inline; } .sound.muted .s-on { display: none; }
-.sound input[type=range] { --fill: 50%; -webkit-appearance: none; appearance: none; width: 120px; height: 4px; margin: 0; border-radius: 99px; cursor: pointer;
-  background: linear-gradient(90deg, var(--sc) var(--fill), rgba(255,255,255,0.35) var(--fill)); }
-.sound.muted input[type=range] { background: rgba(255,255,255,0.35); }
-.sound input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--sc); border: 0; }
-.sound input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--sc); border: 0; }
+.sound input[type=range] { --fill: 50%; -webkit-appearance: none; appearance: none; width: 64px; height: 3px; margin: 0; border-radius: 99px; cursor: pointer;
+  background: linear-gradient(90deg, var(--sc) var(--fill), rgba(255,255,255,0.3) var(--fill)); }
+.sound.muted input[type=range] { background: rgba(255,255,255,0.3); }
+.sound input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; border: 0; }
+.sound input[type=range]::-moz-range-thumb { width: 10px; height: 10px; border-radius: 50%; background: #fff; border: 0; }
 
 .frame-label {
   position: relative; display: inline-flex; align-items: center; gap: 8px;
