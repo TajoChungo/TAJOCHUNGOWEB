@@ -82,6 +82,19 @@ h1 {
 }
 .chip:hover { border-color: var(--glow); transform: translateY(-2px); background: rgba(21,42,46,0.95); }
 .chip svg { width: 16px; height: 16px; fill: currentColor; flex: none; }
+/* Redes con su color */
+.chip.tw, .chip.dc, .chip.yt, .chip.tt, .chip.ig, .chip.xx { color: #fff; border-color: transparent; }
+.chip.tw { background: #9146ff; }
+.chip.dc { background: #5865f2; }
+.chip.yt { background: #ff0000; }
+.chip.tt { background: #000; box-shadow: -2px 0 0 #25f4ee, 2px 0 0 #fe2c55; }
+.chip.ig { background: linear-gradient(45deg, #feda75, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5); }
+.chip.xx { background: #000; border-color: rgba(255,255,255,0.35); }
+.chip.tw:hover, .chip.dc:hover, .chip.yt:hover, .chip.ig:hover { filter: brightness(1.12); border-color: transparent; }
+.chip.tw:hover { background: #9146ff; } .chip.dc:hover { background: #5865f2; } .chip.yt:hover { background: #ff0000; }
+.chip.ig:hover { background: linear-gradient(45deg, #feda75, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5); }
+.chip.tt:hover, .chip.xx:hover { background: #111; border-color: rgba(255,255,255,0.6); }
+
 
 .ticker { margin-top: 30px; overflow: hidden; border-block: 1px solid var(--line); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 .ticker-track { display: flex; width: max-content; animation: slide 28s linear infinite; }
