@@ -92,10 +92,7 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
           <div class="kbar" id="kbar" hidden>
             <span class="kb-viewers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0v1H2v-1Zm15.5-9a3.5 3.5 0 1 0-1.4-6.7 5.9 5.9 0 0 1 0 6.4 3.5 3.5 0 0 0 1.4.3ZM18 21h4v-1a6 6 0 0 0-4.2-5.7A8.9 8.9 0 0 1 18 20v1Z"/></svg><b id="kb-count">0</b></span>
             <span class="kb-time"><i></i><b id="kb-time">00:00:00</b></span>
-            <span class="sound muted" id="sound">
-              <button type="button" class="sound-btn" id="sound-btn" aria-label="Activar sonido"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path class="s-on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="s-off" d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-              <input type="range" id="sound-vol" min="0" max="100" value="50" autocomplete="off" aria-label="Volumen">
-            </span>
+            <a class="kb-sound" href="https://kick.com/elmuelle" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Ver con sonido en Kick</a>
             <button type="button" class="kb-full" id="kb-full" aria-label="Pantalla completa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
         </div>
@@ -186,15 +183,14 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
   }
   var top = frame.querySelector(".frame-top");
   var shield = document.getElementById("shield"), kbar = document.getElementById("kbar");
-  var sound = document.getElementById("sound"), sbtn = document.getElementById("sound-btn");
-  var svol = document.getElementById("sound-vol"), kbCount = document.getElementById("kb-count"), kbTime = document.getElementById("kb-time");
-  var host = location.hostname || "tajochungo.com", kickMuted = true, kickStart = null, uiTimer = null;
+  var kbCount = document.getElementById("kb-count"), kbTime = document.getElementById("kb-time");
+  var host = location.hostname || "tajochungo.com", kickStart = null, uiTimer = null;
   function plainIframe(box, src) {
     var f = document.createElement("iframe");
     f.src = src; f.allowFullscreen = true; f.setAttribute("allow", "autoplay; fullscreen");
     box.appendChild(f); return f;
   }
-  function kickSrc() { return "https://player.kick.com/elmuelle?muted=" + kickMuted + "&autoplay=true"; }
+  function kickSrc() { return "https://player.kick.com/elmuelle?muted=true&autoplay=true"; }
   // Controles propios en Kick: aparecen al mover el ratón y se van todos juntos a los 3 s, como los de Kick
   function wake() {
     frame.classList.add("ui");
@@ -206,28 +202,13 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
   kbar.addEventListener("pointermove", wake);
   shield.addEventListener("pointerleave", function (e) { if (!kbar.contains(e.relatedTarget)) sleep(); });
   kbar.addEventListener("pointerleave", function (e) { if (e.relatedTarget !== shield) sleep(); });
-  shield.addEventListener("click", function () { wake(); setKick(!kickMuted); });
+  shield.addEventListener("click", wake);
   shield.addEventListener("dblclick", fullscreen);
   function fullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else if (frame.requestFullscreen) frame.requestFullscreen();
   }
   document.getElementById("kb-full").addEventListener("click", fullscreen);
-  function paintSound() {
-    sound.classList.toggle("muted", kickMuted);
-    sbtn.setAttribute("aria-label", kickMuted ? "Activar sonido" : "Silenciar");
-    svol.style.setProperty("--fill", (kickMuted ? 0 : svol.value) + "%");
-  }
-  function setKick(muted) {
-    if (muted === kickMuted) { paintSound(); return; }
-    kickMuted = muted;
-    if (!muted && Number(svol.value) === 0) svol.value = 50;
-    var f = frame.querySelector(".player iframe"); if (f) f.src = kickSrc();
-    paintSound();
-  }
-  sbtn.addEventListener("click", function () { setKick(!kickMuted); });
-  svol.addEventListener("input", function () { svol.style.setProperty("--fill", svol.value + "%"); });
-  svol.addEventListener("change", function () { setKick(Number(svol.value) === 0); });
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   setInterval(function () {
     if (!kickStart) return;
@@ -245,7 +226,7 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
     current = which;
     var old = frame.querySelector(".player");
     if (old) old.remove();
-    kickMuted = true; sleep(); paintSound();
+    sleep();
     screen.classList.toggle("is-live", !!which);
     shield.hidden = kbar.hidden = which !== "kick";
     if (!which) {
@@ -254,7 +235,7 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
       return;
     }
     var box = document.createElement("div");
-    box.className = "player";
+    box.className = "player " + which;
     box.title = which === "twitch" ? "Directo de Tajochungo en Twitch" : "Directo de ElMuelle en Kick";
     frame.insertBefore(box, top);
     plainIframe(box, which === "twitch"
