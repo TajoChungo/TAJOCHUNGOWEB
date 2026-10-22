@@ -11,6 +11,14 @@
     RP.step = function () { if (this.visible) this.updateSize(); return step.call(this); };
   }
 
+  // ---- En móvil el menú se desliza: si la sección actual queda fuera, se mueve para que se vea
+  var nav = document.querySelector(".nav"), cur = nav && nav.querySelector('[aria-current="page"]');
+  // (lo justo para que asome entera, sin esconder "Inicio" si no hace falta; 28px = zona difuminada del borde)
+  if (cur && nav.scrollWidth > nav.clientWidth) {
+    var over = cur.offsetLeft + cur.offsetWidth - (nav.clientWidth - 28);
+    if (over > 0) nav.scrollLeft = over;
+  }
+
   var y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 
@@ -63,6 +71,71 @@
       });
     };
     check(); setInterval(check, 60000);
+  }
+
+  // ---- Emotes y cartel en grande: clic para abrir, flechas (o deslizar en móvil) para pasar, Esc o clic fuera para cerrar
+  var emotes = document.querySelectorAll("[data-big]");
+  if (emotes.length) {
+    var lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.setAttribute("aria-label", "Imagen en grande");
+    lb.innerHTML = '<img alt=""><button type="button" class="lb-btn lb-close" aria-label="Cerrar">✕</button>' +
+      '<button type="button" class="lb-btn lb-prev" aria-label="Anterior">‹</button>' +
+      '<button type="button" class="lb-btn lb-next" aria-label="Siguiente">›</button><p class="lb-count"></p>';
+    document.body.appendChild(lb);
+    var lbImg = lb.querySelector("img"), lbCount = lb.querySelector(".lb-count"), group = [], idx = 0, opener = null;
+    var show = function (i) {
+      idx = (i + group.length) % group.length;
+      var b = group[idx];
+      lbImg.src = b.getAttribute("data-big");
+      lbImg.alt = b.querySelector("img").alt;
+      lbCount.textContent = (idx + 1) + " / " + group.length;
+    };
+    // Al cerrar: la página vuelve a poder moverse y el foco vuelve al emote (sin saltar de sitio)
+    var close = function () {
+      lb.classList.remove("open"); root.style.overflow = "";
+      document.removeEventListener("keydown", onKey);
+      if (opener) opener.focus({ preventScroll: true });
+    };
+    var onKey = function (e) {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") show(idx + 1);
+      else if (e.key === "ArrowLeft") show(idx - 1);
+      else if (e.key === "Tab") { // el tabulador se queda dentro del visor
+        var bs = Array.prototype.filter.call(lb.querySelectorAll(".lb-btn"), function (x) { return !x.hidden; });
+        var at = bs.indexOf(document.activeElement);
+        e.preventDefault();
+        bs[(at + (e.shiftKey ? -1 : 1) + bs.length) % bs.length].focus();
+      }
+    };
+    Array.prototype.forEach.call(emotes, function (b) {
+      b.addEventListener("click", function () {
+        group = Array.prototype.slice.call(b.parentElement.querySelectorAll("[data-big]"));
+        opener = b;
+        show(group.indexOf(b));
+        var many = group.length > 1;
+        lb.querySelector(".lb-prev").hidden = lb.querySelector(".lb-next").hidden = lbCount.hidden = !many;
+        lb.classList.toggle("wide", b.hasAttribute("data-wide"));
+        lb.classList.add("open"); root.style.overflow = "hidden"; // la página de detrás no se mueve mientras está abierto
+        document.addEventListener("keydown", onKey);
+        lb.querySelector(".lb-close").focus();
+      });
+    });
+    lb.addEventListener("click", function (e) {
+      if (e.target === lb) close();
+      else if (e.target.closest(".lb-close")) close();
+      else if (e.target.closest(".lb-prev")) show(idx - 1);
+      else if (e.target.closest(".lb-next")) show(idx + 1);
+    });
+    var x0 = null;
+    lb.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+    });
   }
 
   // ---- Aparición suave de los bloques al llegar a ellos
