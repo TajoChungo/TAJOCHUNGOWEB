@@ -84,7 +84,7 @@ h1 {
 .chip svg { width: 16px; height: 16px; fill: currentColor; flex: none; }
 /* Redes con su color, en ambiente con la web: chip oscuro, icono y borde del color de la red, brillo al pasar */
 .chip.tw { --c: #9146ff; } .chip.dc { --c: #5865f2; } .chip.yt { --c: #ff3b3b; }
-.chip.tt { --c: #25f4ee; } .chip.ig { --c: #e1306c; } .chip.xx { --c: #e7e9ea; }
+.chip.tt { --c: #25f4ee; } .chip.ig { --c: #e1306c; } .chip.xx { --c: #e7e9ea; } .chip.sp { --c: #1ed760; }
 .socials .chip { border-color: color-mix(in srgb, var(--c) 45%, transparent); box-shadow: inset 2px 0 0 var(--c); }
 .socials .chip svg { color: var(--c); filter: drop-shadow(0 0 4px color-mix(in srgb, var(--c) 70%, transparent)); }
 .chip.tt svg { filter: drop-shadow(-1px 0 0 #25f4ee) drop-shadow(1px 0 0 #fe2c55); color: #fff; }
