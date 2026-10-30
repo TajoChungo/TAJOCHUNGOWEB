@@ -51,14 +51,64 @@
 </header>
 
 <main>
-  <section class="page-hero lost wip">
+  <section class="page-hero">
     <div class="page-water" aria-hidden="true"></div>
     <div class="wrap">
-      <span class="wip-bob" aria-hidden="true"><img class="wip-barrel" src="media/barril-lg.webp" alt="" width="200"></span>
       <p class="eyebrow">League of Legends</p>
-      <h1>Work in progress</h1>
-      <p class="intro">Estoy preparando esta sección. Vuelve pronto.</p>
-      <p style="margin-top:22px"><a class="btn" href="index.html">← Volver al inicio</a></p>
+      <h1>Mis cuentas</h1>
+      <p class="intro">Gangplank y Kled, top y mid. Estas son mis dos cuentas de EUW por si quieres cotillear el elo.</p>
+      <div class="mains">
+        <span class="mains-label">Mis campeones</span>
+        <span class="mains-champ"><img src="media/lol/gangplank.webp" alt="" width="48" height="48">Gangplank</span>
+        <span class="mains-champ"><img src="media/lol/kled.webp" alt="" width="48" height="48">Kled</span>
+      </div>
+    </div>
+  </section>
+  <section class="block">
+    <div class="wrap">
+      <div class="accounts">
+        <article class="acc reveal" data-cuenta="0">
+          <div class="acc-head">
+            <img class="acc-icon" data-c="icono" src="media/lol/icono-1103.webp" alt="" width="64" height="64">
+            <div>
+              <span class="acc-tag">Cuenta principal</span>
+              <h3>Barril Senil <small>#TTV</small></h3>
+              <span class="acc-lvl" data-c="nivel">EUW · Nivel 774</span>
+            </div>
+          </div>
+          <div class="rank silver" data-c="rank">
+            <img class="rank-emblem" data-c="emblema" src="media/lol/emblema-silver.webp" alt="" width="240" height="168">
+            <div><b data-c="liga">Plata II</b><span data-c="lp">32 LP</span></div>
+          </div>
+          <div class="wr" data-c="wr" role="img" aria-label="49,4 % de victorias"><i style="width:49.4%"></i></div>
+          <div class="wr-txt"><span data-c="vd">710 victorias · 727 derrotas</span><span data-c="pct">49,4 %</span></div>
+          <div class="acc-links">
+            <a class="acc-link" href="https://blitz.gg/lol/profile/euw1/Barril%20Senil-TTV" target="_blank" rel="noopener">Ver en Blitz →</a>
+            <a class="acc-link" href="https://www.op.gg/summoners/euw/Barril%20Senil-TTV" target="_blank" rel="noopener">Ver en OP.GG →</a>
+          </div>
+        </article>
+        <article class="acc reveal" data-cuenta="1" style="--d:1">
+          <div class="acc-head">
+            <img class="acc-icon" data-c="icono" src="media/lol/icono-5026.webp" alt="" width="64" height="64">
+            <div>
+              <span class="acc-tag">Cuenta secundaria</span>
+              <h3>GANG Y PLANK <small>#TTV</small></h3>
+              <span class="acc-lvl" data-c="nivel">EUW · Nivel 242</span>
+            </div>
+          </div>
+          <div class="rank gold" data-c="rank">
+            <img class="rank-emblem" data-c="emblema" src="media/lol/emblema-gold.webp" alt="" width="240" height="206">
+            <div><b data-c="liga">Oro III</b><span data-c="lp">78 LP</span></div>
+          </div>
+          <div class="wr" data-c="wr" role="img" aria-label="39,6 % de victorias"><i style="width:39.6%"></i></div>
+          <div class="wr-txt"><span data-c="vd">19 victorias · 29 derrotas</span><span data-c="pct">39,6 %</span></div>
+          <div class="acc-links">
+            <a class="acc-link" href="https://blitz.gg/lol/profile/euw1/GANG%20Y%20PLANK-TTV" target="_blank" rel="noopener">Ver en Blitz →</a>
+            <a class="acc-link" href="https://www.op.gg/summoners/euw/GANG%20Y%20PLANK-TTV" target="_blank" rel="noopener">Ver en OP.GG →</a>
+          </div>
+        </article>
+      </div>
+      <p class="note"><span id="lol-fecha">Clasificatoria Solo/Dúo a 30 de octubre de 2026.</span> Para verlo al momento, entra en Blitz u OP.GG.</p>
     </div>
   </section>
 </main>
@@ -71,5 +121,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="ripples.js"></script>
 <script src="site.js"></script>
+<script src="datos/lol.js"></script>
+<script src="lol.js"></script>
 </body>
 </html>

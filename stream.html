@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mi stream · Tajochungo</title>
-<meta name="description" content="Estadísticas del canal de Tajochungo en Twitch: horas en directo, seguidores, récords y últimos directos.">
+<meta name="description" content="Estadísticas del canal de Tajochungo en Twitch: horas en directo, seguidores y récords, mes a mes desde 2021.">
 <link rel="icon" type="image/png" href="avatar.png">
 <link rel="apple-touch-icon" href="avatar.png">
 <link rel="canonical" href="https://tajochungo.com/stream.html">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://tajochungo.com/stream.html">
 <meta property="og:title" content="Mi stream · Tajochungo">
-<meta property="og:description" content="Estadísticas del canal de Tajochungo en Twitch: horas en directo, seguidores, récords y últimos directos.">
+<meta property="og:description" content="Estadísticas del canal de Tajochungo en Twitch: horas en directo, seguidores y récords, mes a mes desde 2021.">
 <meta property="og:image" content="https://tajochungo.com/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -51,14 +51,48 @@
 </header>
 
 <main>
-  <section class="page-hero lost wip">
+  <section class="page-hero">
     <div class="page-water" aria-hidden="true"></div>
     <div class="wrap">
-      <span class="wip-bob" aria-hidden="true"><img class="wip-barrel" src="media/barril-lg.webp" alt="" width="200"></span>
       <p class="eyebrow">Mi stream</p>
-      <h1>Work in progress</h1>
-      <p class="intro">Estoy preparando esta sección. Vuelve pronto.</p>
-      <p style="margin-top:22px"><a class="btn" href="index.html">← Volver al inicio</a></p>
+      <h1>Mi historial</h1>
+      <p class="intro">Los números de mi canal de Twitch desde el 22 de abril de 2021: casi seis años de directos, con sus parones y sus vueltas.</p>
+    </div>
+  </section>
+  <section class="block">
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat reveal"><b data-dato="seguidores" data-live="followers_total">2.202</b><span>Seguidores</span></div>
+        <div class="stat reveal" style="--d:1"><b data-dato="horas">3.457</b><span>Horas en directo</span></div>
+        <div class="stat reveal" style="--d:2"><b data-dato="dias">712</b><span>Días en directo</span></div>
+        <div class="stat reveal" style="--d:3"><b data-dato="record">105</b><span>Récord de espectadores</span><small data-dato="record_mes">Septiembre de 2026</small></div>
+      </div>
+      <p class="stats-label reveal">Últimos 30 días <span class="live-note" id="live-note" data-dato="fecha_a">a 30 de octubre de 2026</span></p>
+      <div class="stats stats-30 reveal">
+        <div class="stat"><b data-live="hours">80</b><span>Horas en directo</span></div>
+        <div class="stat"><b data-live="avg_viewers">16</b><span>Espectadores de media</span></div>
+        <div class="stat"><b data-live="max_viewers">40</b><span>Pico de espectadores</span></div>
+        <div class="stat"><b data-live="followers">+52</b><span>Seguidores nuevos</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="head reveal"><div><h2 class="h-orange">Estos seis años</h2></div></div>
+      <figure class="tchart reveal" id="tchart">
+        <figcaption class="tchart-title">Horas en directo cada mes</figcaption>
+        <div class="tchart-plot" id="plot-hours"></div>
+        <figcaption class="tchart-title">Seguidores</figcaption>
+        <div class="tchart-plot" id="plot-followers"></div>
+        <div class="tchart-tip" id="tchart-tip" hidden></div>
+      </figure>
+    </div>
+  </section>
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="head reveal"><div><h2 class="h-orange">Horas al mes</h2></div></div>
+      <div class="years reveal" id="years"></div>
+      <p class="note"><span data-dato="fuente">Datos de TwitchTracker y Twitch a 30 de octubre de 2026.</span> <a class="acc-link" href="https://twitchtracker.com/tajochungo/statistics" target="_blank" rel="noopener">Ver en TwitchTracker →</a></p>
     </div>
   </section>
 </main>
@@ -71,5 +105,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="ripples.js"></script>
 <script src="site.js"></script>
+<script src="datos/stream.js"></script>
+<script src="stream.js"></script>
 </body>
 </html>
