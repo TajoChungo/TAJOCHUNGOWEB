@@ -285,10 +285,10 @@ section.block { padding-block: 72px; position: relative; z-index: 2; }
 .stat b { display: block; font-family: var(--f-label); font-weight: 700; font-size: clamp(40px, 5vw, 58px); line-height: 1; color: var(--glow); font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgba(111,245,216,0.35); }
 .stat span { display: block; margin-top: 8px; font-family: var(--f-label); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; color: var(--ink); }
 .stat small { display: block; color: var(--mute); font-size: 13px; margin-top: 2px; }
-.stats-label { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 52px 0 18px; font-family: var(--f-display); font-size: 30px; line-height: 1; color: var(--ink); }
-.live-note { display: inline-flex; align-items: center; gap: 7px; font-family: var(--f-label); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; color: var(--mute); }
-.live-note.on { color: var(--glow); }
-.live-note.on::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 8px var(--glow); animation: pulse 1.4s infinite; }
+.stats-label { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 60px 0 20px; font-family: var(--f-label); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; font-size: 14px; line-height: 1; color: var(--glow); }
+.stats-label.on::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 8px var(--glow); animation: pulse 1.4s infinite; }
+.live-note { color: var(--mute); }
+.live-note::before { content: "·"; margin-right: 10px; }
 .stats-30 .stat b { font-size: clamp(32px, 3.6vw, 44px); color: var(--ink); text-shadow: none; }
 /* Gráficas del historial */
 .tchart { position: relative; margin: 0; touch-action: pan-y; user-select: none; }

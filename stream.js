@@ -45,7 +45,7 @@ var STREAM_MESES = STREAM_DATOS.meses;
         if (v[k] != null) b.textContent = v[k];
       });
       var nota = document.getElementById("live-note");
-      if (nota) { nota.textContent = "al momento"; nota.classList.add("on"); }
+      if (nota) { nota.textContent = "al momento"; nota.parentNode.classList.add("on"); }
     })
     .catch(function () {});
 })();
