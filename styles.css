@@ -17,7 +17,6 @@
   --line: rgba(111, 245, 216, 0.16);
   --live: #ff4f4f;
   --twitch: #9146ff;
-  --kick: #53fc18;
   --discord: #5865f2;
 
   --f-display: "Pieces of Eight", "Pirata One", "Times New Roman", serif;
@@ -120,24 +119,7 @@ h1 {
 .frame { position: relative; aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden; background: #000; border-radius: var(--r); }
 .frame video, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
 .frame .player { position: absolute; inset: 0; }
-/* En Kick se recortan sus propios botones (arriba y abajo) para que solo se vean los míos; el vídeo sigue ocupando todo */
-.frame .player.kick iframe { top: -60px; bottom: auto; height: calc(100% + 120px); }
 .frame-top { position: absolute; left: 10px; top: 10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-/* Controles propios del directo de Kick, copiando los de Kick: abajo, aparecen al mover el ratón y se van juntos */
-.shield { position: absolute; inset: 0; z-index: 1; cursor: pointer; }
-.shield[hidden], .kbar[hidden] { display: none; }
-.frame.ui .shield { cursor: default; }
-.kbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; height: 48px; padding: 0 14px; display: flex; align-items: center; gap: 14px;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.6)); color: #fff; font: 700 13px/1 var(--f-body); font-variant-numeric: tabular-nums;
-  opacity: 0; pointer-events: none; transition: opacity .25s; }
-.frame.ui .kbar, .kbar:focus-within { opacity: 1; pointer-events: auto; }
-.kb-viewers, .kb-time, .kb-sound { display: inline-flex; align-items: center; gap: 6px; height: 20px; }
-.kb-viewers { color: #53fc18; } .kb-viewers svg { width: 16px; height: 16px; fill: currentColor; }
-.kb-time i { width: 6px; height: 6px; border-radius: 50%; background: #53fc18; }
-.kb-sound { gap: 6px; padding: 0 9px; height: 24px; border-radius: 4px; color: #53fc18; text-decoration: none; background: rgba(83,252,24,0.12); border: 1px solid rgba(83,252,24,0.45); transition: background .2s, color .2s; }
-.kb-sound svg { width: 15px; height: 15px; fill: currentColor; }
-.kb-sound:hover { background: #53fc18; color: #081113; }
-.kb-full { display: inline-flex; align-items: center; padding: 0; border: 0; background: none; cursor: pointer; margin-left: auto; color: #fff; opacity: .9; } .kb-full:hover { opacity: 1; } .kb-full svg { width: 20px; height: 20px; }
 .frame:fullscreen { aspect-ratio: auto; border-radius: 0; }
 
 .frame-label {
@@ -147,7 +129,7 @@ h1 {
   backdrop-filter: blur(4px); pointer-events: none;
 }
 .frame-label::before { content: ""; width: 7px; height: 7px; border-radius: 999px; background: #5d6e6b; }
-.channels { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.channels { display: grid; grid-template-columns: minmax(0,1fr); gap: 8px; margin-top: 10px; }
 .chan {
   position: relative; display: flex; align-items: center; gap: 10px; min-width: 0; padding: 9px 10px; text-decoration: none;
   background: rgba(8,17,19,0.55); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--r); transition: border-color .2s;
@@ -157,7 +139,6 @@ h1 {
 .chan-ico { width: 30px; height: 30px; border-radius: var(--r); display: grid; place-items: center; flex: none; }
 .chan-ico svg { width: 16px; height: 16px; }
 .chan-ico.tw { background: var(--twitch); } .chan-ico.tw svg { fill: #fff; }
-.chan-ico.kk { background: var(--kick); } .chan-ico.kk svg { fill: #0b0e0f; }
 .chan-txt { display: grid; min-width: 0; line-height: 1.15; }
 .chan-name { font-weight: 700; font-size: 15px; }
 .chan-sub { font-size: 12px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -241,20 +222,6 @@ section.block { padding-block: 72px; position: relative; z-index: 2; }
 .page-hero.lost .intro { margin-inline: auto; }
 .lost-barrel { width: 200px; filter: drop-shadow(0 14px 20px rgba(0,0,0,0.6)); animation: bob 4.2s ease-in-out infinite; margin-bottom: 10px; }
 
-/* Kick secundario */
-.kick-card {
-  display: inline-grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 14px; max-width: 100%; padding: 12px 16px;
-  border-radius: var(--r); text-decoration: none; background: linear-gradient(90deg, rgba(83,252,24,0.10), rgba(15,29,32,0.7) 60%);
-  border: 1px solid rgba(83,252,24,0.4); box-shadow: 0 0 22px rgba(83,252,24,0.14); transition: border-color .2s, box-shadow .2s;
-}
-.kick-card:hover { border-color: var(--kick); box-shadow: 0 0 30px rgba(83,252,24,0.28); }
-.kick-ico { width: 32px; height: 32px; border-radius: var(--r); display: grid; place-items: center; background: var(--kick); box-shadow: 0 0 12px rgba(83,252,24,0.6); flex: none; }
-.kick-ico svg { width: 16px; height: 16px; fill: #0b0e0f; }
-.kick-txt { display: grid; min-width: 0; }
-.kick-name { font-family: var(--f-display); font-size: 30px; line-height: 1.05; color: var(--kick); text-shadow: 0 0 6px rgba(83,252,24,0.85), 0 0 18px rgba(83,252,24,0.5), 0 0 40px rgba(83,252,24,0.3); margin: 2px 0 4px; }
-.kick-desc { color: var(--ink); font-size: 15px; }
-.kick-cta { color: var(--kick); font-size: 18px; transition: transform .2s; }
-.kick-card:hover .kick-cta { transform: translateX(3px); }
 
 /* ---------- Páginas de sección ---------- */
 .page-hero { position: relative; overflow: hidden; padding-block: 150px 56px; background: var(--hold); }

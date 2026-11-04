@@ -63,11 +63,9 @@
     document.body.appendChild(pill);
     var check = function () {
       var tw = get("https://decapi.me/twitch/uptime/tajochungo").then(function (t) { return !/offline|error|not found|could not/i.test(t); }).catch(function () { return false; });
-      var kk = get("https://kick.com/api/v2/channels/elmuelle", true).then(function (j) { return !!(j && j.livestream && j.livestream.is_live !== false); }).catch(function () { return false; });
-      Promise.all([tw, kk]).then(function (r) {
-        if (r[0]) { pill.href = "https://www.twitch.tv/tajochungo"; pill.textContent = "En directo en Twitch"; }
-        else if (r[1]) { pill.href = "https://kick.com/elmuelle"; pill.textContent = "En directo en Kick"; }
-        pill.hidden = !(r[0] || r[1]);
+      tw.then(function (on) {
+        pill.href = "https://www.twitch.tv/tajochungo"; pill.textContent = "En directo en Twitch";
+        pill.hidden = !on;
       });
     };
     check(); setInterval(check, 60000);
