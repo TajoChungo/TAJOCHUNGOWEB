@@ -244,23 +244,26 @@
         var vol = A.createGain(); vol.gain.value = 0;
         lp.connect(vol); vol.connect(toneNode);
         var send = A.createGain(); send.gain.value = .35; vol.connect(send); send.connect(wet);
-        // el mar: retumbar grave que respira despacio
+        // el mar por dentro: solo graves, muy filtrados (sin siseo: el siseo es lo que sonaba a aire)
         var r = A.createBufferSource(); r.buffer = brown; r.loop = true;
-        var rl = A.createBiquadFilter(); rl.type = "lowpass"; rl.frequency.value = 150;
+        var l1 = A.createBiquadFilter(); l1.type = "lowpass"; l1.frequency.value = 95; l1.Q.value = .5;
+        var l2 = A.createBiquadFilter(); l2.type = "lowpass"; l2.frequency.value = 95; l2.Q.value = .5;
         var sea = A.createGain(); sea.gain.value = 0;
-        var lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = .07; lg.gain.value = .06; lfo.connect(lg); lg.connect(sea.gain);
-        r.connect(rl); rl.connect(sea); sea.connect(lp); r.start(t); lfo.start(t);
-        // el agua moviéndose: un rumor más agudo que va y viene
-        var wn = A.createBufferSource(); wn.buffer = white; wn.loop = true;
-        var bp = A.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 420; bp.Q.value = .8;
-        var swell = A.createGain(); swell.gain.value = 0;
-        var lfo2 = A.createOscillator(), lg2 = A.createGain(); lfo2.frequency.value = .13; lg2.gain.value = .01; lfo2.connect(lg2); lg2.connect(swell.gain);
-        wn.connect(bp); bp.connect(swell); swell.connect(lp); wn.start(t); lfo2.start(t);
-        // en el camarote: un fondo de madera y casco muy suave
-        var room = A.createGain(); room.gain.value = 0;
-        var rb = A.createBufferSource(); rb.buffer = brown; rb.loop = true; var rbl = A.createBiquadFilter(); rbl.type = "lowpass"; rbl.frequency.value = 260;
-        rb.connect(rbl); rbl.connect(room); room.connect(lp); rb.start(t, 1.3);
-        nodes = { lp: lp, vol: vol, sea: sea, swell: swell, room: room };
+        var swayG = A.createGain(); swayG.gain.value = 1; // respira despacio
+        var lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = .08; lg.gain.value = .35; lfo.connect(lg); lg.connect(swayG.gain);
+        r.connect(l1); l1.connect(l2); l2.connect(swayG); swayG.connect(sea); sea.connect(lp); r.start(t); lfo.start(t);
+        // presión del agua: dos tonos muy graves casi iguales que «laten» (como un zumbido en los oídos al bucear)
+        var drone = A.createGain(); drone.gain.value = 0;
+        [[47, .5], [48.4, .5], [71, .18]].forEach(function (f) { var o = A.createOscillator(), g = A.createGain(); o.type = "sine"; o.frequency.value = f[0]; g.gain.value = f[1]; o.connect(g); g.connect(drone); o.start(t); });
+        drone.connect(lp);
+        // el barco: el sonido grabado de Tajo (madera del casco crujiendo), en bucle sin cortes
+        var ship = A.createGain(); ship.gain.value = 0; ship.connect(lp);
+        try {
+          fetch("media/barco-ambiente.wav").then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
+            return new Promise(function (ok, ko) { A.decodeAudioData(ab, ok, ko); });
+          }).then(function (buf) { var s = A.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(ship); s.start(); }).catch(function () {});
+        } catch (e) {}
+        nodes = { lp: lp, vol: vol, sea: sea, drone: drone, ship: ship };
       }
       // un crujido de madera: roce a tirones (como una tabla o una cuerda tensa) con resonancias de madera
       function creak(level) {
@@ -285,11 +288,11 @@
       function apply() {
         if (!nodes) return;
         var t = A.currentTime, d = depth;
-        nodes.lp.frequency.setTargetAtTime(inWater ? 1500 - d * 1150 : 2400, t, .4); // cuanto más hondo, más sordo
+        nodes.lp.frequency.setTargetAtTime(inWater ? 1400 - d * 1000 : 2400, t, .4); // cuanto más hondo, más sordo
         nodes.vol.gain.setTargetAtTime(on ? 1 : 0, t, .8);
-        nodes.sea.gain.setTargetAtTime(inWater ? .13 + d * .07 : .01, t, .7);
-        nodes.swell.gain.setTargetAtTime(inWater ? .018 * (1 - d * .6) : 0, t, .7);
-        nodes.room.gain.setTargetAtTime(inWater ? 0 : .05, t, .6);
+        nodes.sea.gain.setTargetAtTime(inWater ? .1 + d * .05 : 0, t, .9);
+        nodes.drone.gain.setTargetAtTime(inWater ? .012 + d * .008 : 0, t, 1.2);
+        nodes.ship.gain.setTargetAtTime(inWater ? .22 * (1 - d * .5) : .4, t, .8); // en el camarote, claro; bajo el agua, el casco a lo lejos
       }
       return {
         start: function () {
@@ -297,8 +300,10 @@
           if (A.state === "suspended") A.resume();
           if (!nodes) {
             build();
-            loop("creak", 2600, 7500, function () { creak(inWater ? .05 : .11); }); // en el camarote se oye más; bajo el agua, el casco a lo lejos
-            loop("bub", 700, 2600, function () { if (inWater) bubble(A.currentTime + .02, rnd(.012, .03)); });
+            loop("bub", 1600, 4200, function () {
+              if (!inWater) return; var t0 = A.currentTime + .02, n = Math.random() < .35 ? Math.floor(rnd(3, 8)) : 1;
+              for (var k = 0; k < n; k++) bubble(t0 + k * rnd(.05, .14), rnd(.01, .026) * (1 - k / (n + 2)));
+            });
           }
           apply();
         },
