@@ -149,6 +149,7 @@
     chapter($("st-ch1"), p, .47, .53, .61, .66);
     var tvOn = chapter($("st-ch2"), p, .70, .76, .88, .94) > .02;
     bitacora(P);
+    if (window.TJSound && window.TJSound.ambient) window.TJSound.ambient.set(seaOn, Math.min(1, d * .6 + deep * .4)); // el sonido se apaga con la profundidad
     // el vídeo del camarote solo se reproduce cuando se ve la ventana
     var ov = $("offline-video");
     if (ov) { if (tvOn && !ov.hidden) { if (ov.paused) { var pr = ov.play(); if (pr && pr.catch) pr.catch(function () {}); } } else if (!ov.paused) ov.pause(); }
@@ -361,7 +362,7 @@
   }
   window.__stPrepareBubbles = prepare;
   function useFile() { return !!(cover && cover.readyState >= 2 && innerWidth / innerHeight >= 1.3); }
-  function sndReady() { return !!(coverSnd && coverSnd.readyState >= 2); }
+  function sndReady() { return !!(coverSnd && coverSnd.readyState >= 2) && !(window.TJSound && window.TJSound.muted()); }
   function boomSound() { if (window.TJSound) window.TJSound.boom(sndReady()); } // el sonido vive en site.js
 
   function explode(door, href) {

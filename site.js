@@ -165,7 +165,8 @@
    retumbar con turbulencia · burbujas de verdad (cada una sube de tono al soltarse) · siseo de espuma ·
    todo dentro de un eco corto y oscuro, como bajo el agua, y un compresor para que suene compacto. */
 (function () {
-  var A = null, bus = null, wet = null, brown = null, white = null;
+  var A = null, bus = null, wet = null, brown = null, white = null, toneNode = null, masterNode = null;
+  function isMuted() { try { return localStorage.getItem("tj-mute") === "1"; } catch (e) { return false; } }
   function rnd(a, b) { return a + Math.random() * (b - a); }
   function setup() {
     if (A) return A;
@@ -173,9 +174,9 @@
     A = new AC();
     var comp = A.createDynamicsCompressor();
     comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 3.5; comp.attack.value = .004; comp.release.value = .3;
-    var master = A.createGain(); master.gain.value = .9;
+    var master = A.createGain(); master.gain.value = isMuted() ? 0 : .9; masterNode = master;
     var tone = A.createBiquadFilter(); tone.type = "lowpass"; tone.frequency.value = 3200; tone.Q.value = .5; // el agua se come los agudos
-    bus = A.createGain(); bus.connect(tone); tone.connect(comp); comp.connect(master); master.connect(A.destination);
+    toneNode = tone; bus = A.createGain(); bus.connect(tone); tone.connect(comp); comp.connect(master); master.connect(A.destination);
     // eco bajo el agua: corto, oscuro y envolvente
     var len = Math.floor(A.sampleRate * 1.7), ir = A.createBuffer(2, len, A.sampleRate);
     for (var ch = 0; ch < 2; ch++) {
@@ -225,10 +226,90 @@
     return g;
   }
   window.TJSound = {
+    muted: isMuted,
+    setMuted: function (m) {
+      try { localStorage.setItem("tj-mute", m ? "1" : "0"); } catch (e) {}
+      if (masterNode) masterNode.gain.setTargetAtTime(m ? 0 : .9, A.currentTime, .08);
+      if (A) { if (m) setTimeout(function () { if (isMuted()) A.suspend(); }, 400); else A.resume(); }
+      document.querySelectorAll("audio").forEach(function (a) { a.muted = m; });
+    },
+    /* ---------- Ambiente de la portada: madera del barco que cruje y, al caer, el mar ----------
+       Todo pasa por un filtro que se cierra según la profundidad: en el camarote se oye claro,
+       bajo el agua apagado y cada vez más sordo. */
+    ambient: (function () {
+      var on = false, inWater = false, depth = 0, nodes = null, timers = [];
+      function build() {
+        var t = A.currentTime;
+        var lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 2400; lp.Q.value = .6;
+        var vol = A.createGain(); vol.gain.value = 0;
+        lp.connect(vol); vol.connect(toneNode);
+        var send = A.createGain(); send.gain.value = .35; vol.connect(send); send.connect(wet);
+        // el mar: retumbar grave que respira despacio
+        var r = A.createBufferSource(); r.buffer = brown; r.loop = true;
+        var rl = A.createBiquadFilter(); rl.type = "lowpass"; rl.frequency.value = 150;
+        var sea = A.createGain(); sea.gain.value = 0;
+        var lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = .07; lg.gain.value = .06; lfo.connect(lg); lg.connect(sea.gain);
+        r.connect(rl); rl.connect(sea); sea.connect(lp); r.start(t); lfo.start(t);
+        // el agua moviéndose: un rumor más agudo que va y viene
+        var wn = A.createBufferSource(); wn.buffer = white; wn.loop = true;
+        var bp = A.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 420; bp.Q.value = .8;
+        var swell = A.createGain(); swell.gain.value = 0;
+        var lfo2 = A.createOscillator(), lg2 = A.createGain(); lfo2.frequency.value = .13; lg2.gain.value = .01; lfo2.connect(lg2); lg2.connect(swell.gain);
+        wn.connect(bp); bp.connect(swell); swell.connect(lp); wn.start(t); lfo2.start(t);
+        // en el camarote: un fondo de madera y casco muy suave
+        var room = A.createGain(); room.gain.value = 0;
+        var rb = A.createBufferSource(); rb.buffer = brown; rb.loop = true; var rbl = A.createBiquadFilter(); rbl.type = "lowpass"; rbl.frequency.value = 260;
+        rb.connect(rbl); rbl.connect(room); room.connect(lp); rb.start(t, 1.3);
+        nodes = { lp: lp, vol: vol, sea: sea, swell: swell, room: room };
+      }
+      // un crujido de madera: roce a tirones (como una tabla o una cuerda tensa) con resonancias de madera
+      function creak(level) {
+        var t = A.currentTime + .02, dur = rnd(.5, 1.5), f0 = rnd(28, 55), f1 = f0 * rnd(1.4, 2.4);
+        var o = A.createOscillator(); o.type = "sawtooth";
+        o.frequency.setValueAtTime(f0, t); o.frequency.linearRampToValueAtTime(f1, t + dur * rnd(.4, .7)); o.frequency.linearRampToValueAtTime(f0 * rnd(.9, 1.3), t + dur);
+        var jit = A.createOscillator(), jg = A.createGain(); jit.type = "triangle"; jit.frequency.value = rnd(6, 13); jg.gain.value = f0 * .35; jit.connect(jg); jg.connect(o.frequency); // los tirones
+        var env = A.createGain(); env.gain.setValueAtTime(0, t);
+        env.gain.linearRampToValueAtTime(level, t + dur * .15); env.gain.setValueAtTime(level * rnd(.6, 1), t + dur * .7); env.gain.linearRampToValueAtTime(0, t + dur);
+        var sum = A.createGain(); sum.gain.value = 1;
+        [[rnd(380, 480), 9], [rnd(700, 900), 12], [rnd(1150, 1400), 14]].forEach(function (fq) { // cuerpo de la madera
+          var b = A.createBiquadFilter(); b.type = "bandpass"; b.frequency.value = fq[0]; b.Q.value = fq[1]; o.connect(b); b.connect(sum);
+        });
+        var p = A.createStereoPanner ? A.createStereoPanner() : null;
+        sum.connect(env); if (p) { p.pan.value = rnd(-.8, .8); env.connect(p); p.connect(nodes.lp); } else env.connect(nodes.lp);
+        o.start(t); jit.start(t); o.stop(t + dur + .05); jit.stop(t + dur + .05);
+      }
+      function loop(kind, min, max, fn) {
+        var id = setTimeout(function () { if (on) fn(); loop(kind, min, max, fn); }, rnd(min, max) * (kind === "bub" ? (1 + depth * 1.5) : 1));
+        timers.push(id);
+      }
+      function apply() {
+        if (!nodes) return;
+        var t = A.currentTime, d = depth;
+        nodes.lp.frequency.setTargetAtTime(inWater ? 1500 - d * 1150 : 2400, t, .4); // cuanto más hondo, más sordo
+        nodes.vol.gain.setTargetAtTime(on ? 1 : 0, t, .8);
+        nodes.sea.gain.setTargetAtTime(inWater ? .13 + d * .07 : .01, t, .7);
+        nodes.swell.gain.setTargetAtTime(inWater ? .018 * (1 - d * .6) : 0, t, .7);
+        nodes.room.gain.setTargetAtTime(inWater ? 0 : .05, t, .6);
+      }
+      return {
+        start: function () {
+          if (on || !setup()) return; on = true;
+          if (A.state === "suspended") A.resume();
+          if (!nodes) {
+            build();
+            loop("creak", 2600, 7500, function () { creak(inWater ? .05 : .11); }); // en el camarote se oye más; bajo el agua, el casco a lo lejos
+            loop("bub", 700, 2600, function () { if (inWater) bubble(A.currentTime + .02, rnd(.012, .03)); });
+          }
+          apply();
+        },
+        stop: function () { on = false; apply(); },
+        set: function (water, d) { if (water === inWater && Math.abs(d - depth) < .02) return; inWater = water; depth = d; apply(); }
+      };
+    })(),
     warm: function () { try { setup(); } catch (e) {} }, // prepara el eco y los ruidos antes de que hagan falta
     // el golpe (portada). Devuelve cuándo termina para que la página nueva lo continúe
     boom: function (fileBubbles) {
-      if (!setup()) return; if (A.state === "suspended") A.resume();
+      if (isMuted() || !setup()) return; if (A.state === "suspended") A.resume();
       var t = A.currentTime + .015;
       // subgrave
       var o = A.createOscillator(), og = A.createGain(); o.type = "sine";
@@ -253,7 +334,7 @@
     },
     // la continuación (página nueva): mismo timbre, más flojo, y se apaga del todo
     tail: function (fileBubbles) {
-      if (!setup()) return; if (A.state === "suspended") A.resume().catch(function () {});
+      if (isMuted() || !setup()) return; if (A.state === "suspended") A.resume().catch(function () {});
       var t = A.currentTime + .02;
       bus.gain.setValueAtTime(0, t); bus.gain.linearRampToValueAtTime(.55, t + .09); bus.gain.setValueAtTime(.55, t + .3); bus.gain.exponentialRampToValueAtTime(.001, t + 2.2);
       rumble(t, .2, .002, 2.1);
@@ -311,7 +392,7 @@
   var root = document.documentElement;
   if (!root.classList.contains("from-sea")) return;
   var quiet = false; try { quiet = sessionStorage.getItem("tj-sea") === "quiet"; sessionStorage.removeItem("tj-sea"); sessionStorage.removeItem("tj-sea-wall"); } catch (e) {}
-  if (!quiet) {
+  if (!quiet && !(window.TJSound && window.TJSound.muted())) {
     var snd = null;
     try { snd = new Audio("media/burbujas-destapa.mp3"); snd.volume = .8; var sp = snd.play(); if (sp && sp.catch) sp.catch(function () {}); } catch (e) { snd = null; }
     if (window.TJSound) window.TJSound.tail(!!snd);
@@ -326,4 +407,27 @@
 (function () {
   var a = document.querySelector("a[data-sea-back]"); if (!a) return;
   a.addEventListener("click", function () { try { sessionStorage.setItem("tj-sea", "quiet"); } catch (e) {} });
+})();
+
+/* Botón de sonido: quita o pone todos los sonidos de la web (se recuerda para la próxima visita).
+   En la portada, además, el ambiente (madera que cruje y el mar) empieza con el primer clic o toque,
+   porque los navegadores no dejan sonar nada antes. */
+(function () {
+  if (!window.TJSound) return;
+  var b = document.createElement("button"); b.type = "button"; b.className = "snd-btn";
+  var ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  var OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  function paint() { var m = window.TJSound.muted(); b.innerHTML = m ? OFF : ON; b.setAttribute("aria-pressed", m ? "true" : "false"); b.setAttribute("aria-label", m ? "Activar el sonido" : "Quitar el sonido"); b.title = m ? "Activar el sonido" : "Quitar el sonido"; b.classList.toggle("off", m); }
+  var portada = !!document.getElementById("st-story"), started = false;
+  function startAmbient() { if (!portada || started || window.TJSound.muted()) return; started = true; b.classList.remove("hint"); window.TJSound.ambient.start(); }
+  b.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var m = !window.TJSound.muted(); window.TJSound.setMuted(m); paint();
+    if (portada) { if (m) window.TJSound.ambient.stop(); else { started = false; startAmbient(); } }
+  });
+  paint(); document.body.appendChild(b);
+  if (portada && !window.TJSound.muted()) {
+    b.classList.add("hint"); // un brillo suave avisa de que hay sonido
+    ["pointerdown", "keydown", "touchend"].forEach(function (ev) { addEventListener(ev, startAmbient, { once: true, passive: true }); });
+  }
 })();
