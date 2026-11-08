@@ -339,7 +339,6 @@
       var c = document.createElement("canvas"); c.width = Math.ceil(w); c.height = Math.ceil(h);
       var x = c.getContext("2d"); x.beginPath(); poly.forEach(function (q, i) { i ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); }); x.closePath();
       x.save(); x.clip(); x.drawImage(img, 0, 0, w, h); x.restore();
-      x.strokeStyle = "rgba(20,12,6,.55)"; x.lineWidth = 1.2; x.stroke(); // canto astillado
       var dk = document.createElement("canvas"); dk.width = c.width; dk.height = c.height; var y = dk.getContext("2d");
       y.drawImage(c, 0, 0); y.globalCompositeOperation = "source-atop"; y.fillStyle = "rgba(4,10,12,.5)"; y.fillRect(0, 0, dk.width, dk.height);
       return { c: c, dk: dk, cen: centroid(poly), a: area(poly) };
