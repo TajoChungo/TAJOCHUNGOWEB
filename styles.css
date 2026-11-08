@@ -257,6 +257,19 @@ section.block { padding-block: 72px; position: relative; z-index: 2; }
 .live-note { color: var(--mute); }
 .live-note::before { content: "·"; margin-right: 10px; }
 .stats-30 .stat b { font-size: clamp(32px, 3.6vw, 44px); color: var(--ink); text-shadow: none; }
+/* Horario de directos: suelto, sin recuadros */
+.sched { text-align: center; }
+.sched p { margin: 0; }
+.sched-days { display: flex; justify-content: center; gap: clamp(14px, 2.4vw, 26px); font-family: var(--f-label); font-weight: 700; font-size: 20px; letter-spacing: 1px; color: var(--ink); }
+.sched-days span { position: relative; }
+.sched-days .off { color: var(--mute); opacity: .45; }
+.sched-days .today { color: var(--glow); text-shadow: 0 0 12px rgba(111,245,216,0.7); }
+.sched-days .today::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 8px var(--glow); }
+.sched-days .today.off { color: var(--mute); text-shadow: none; }
+.sched-days .today.off::after { background: var(--mute); box-shadow: none; }
+.sched-time { margin-top: 22px !important; font-family: var(--f-label); font-weight: 700; font-size: clamp(52px, 8vw, 88px); line-height: 1; color: var(--glow); font-variant-numeric: tabular-nums; text-shadow: 0 0 22px rgba(111,245,216,0.4); white-space: nowrap; }
+.sched-time i { font-style: normal; color: var(--mute); text-shadow: none; font-weight: 500; }
+.sched-games { margin-top: 12px !important; font-family: var(--f-label); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; font-size: 15px; color: var(--orange); }
 /* Gráficas del historial */
 .tchart { position: relative; margin: 0; touch-action: pan-y; user-select: none; }
 .tchart-title { font-family: var(--f-label); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; color: var(--mute); margin: 0 0 8px 40px; }
@@ -516,3 +529,95 @@ header.top { view-transition-name: cabecera; }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }
 /* El lienzo del agua siempre cubre su sección entera */
 .jquery-ripples > canvas { width: 100% !important; height: 100% !important; }
+
+/* ---------- Portada: bajada al mar (entras por la pantalla del camarote y caes al agua) ---------- */
+.st-story { position: relative; height: 1250vh; background: #050b0c; }
+.st-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #050b0c; }
+.st-layer { position: absolute; inset: 0; pointer-events: none; }
+.st-room { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.st-portrait .st-vignette { background: radial-gradient(120% 90% at 50% 45%, rgba(0,0,0,0) 45%, rgba(2,6,7,.85) 100%); }
+.st-flash { background: radial-gradient(circle at 50% 50%, #eafffa 0%, #9ff8e6 45%, #6ff5d8 100%); opacity: 0; }
+.st-sea { opacity: 0; background: linear-gradient(180deg, var(--top, #8ff3df) 0%, var(--mid, #2a8f86) 45%, var(--bot, #0b2a2c) 100%); }
+.st-surface { opacity: 0; background: linear-gradient(180deg, rgba(225,255,249,.75) 0%, rgba(225,255,249,.18) 9%, rgba(225,255,249,0) 22%); }
+.st-rays { opacity: 0; mix-blend-mode: screen; }
+.st-rays i { position: absolute; top: -20%; width: 9vw; min-width: 46px; height: 140%; transform-origin: 50% 0;
+  background: linear-gradient(180deg, rgba(220,255,248,.55), rgba(220,255,248,0) 80%); filter: blur(14px); animation: st-sway 9s ease-in-out infinite alternate; }
+.st-rays i:nth-child(1) { left: 12%; --r: 14deg; animation-duration: 11s; }
+.st-rays i:nth-child(2) { left: 30%; --r: 8deg; width: 5vw; opacity: .7; animation-duration: 8s; }
+.st-rays i:nth-child(3) { left: 48%; --r: 2deg; width: 12vw; animation-duration: 13s; }
+.st-rays i:nth-child(4) { left: 66%; --r: -6deg; width: 6vw; opacity: .8; animation-duration: 10s; }
+.st-rays i:nth-child(5) { left: 84%; --r: -13deg; animation-duration: 12s; }
+@keyframes st-sway { from { transform: rotate(calc(var(--r) - 3deg)); } to { transform: rotate(calc(var(--r) + 3deg)); } }
+.st-caustics { opacity: 0; mix-blend-mode: soft-light;
+  background:
+    radial-gradient(ellipse 60px 24px at 20% 30%, rgba(255,255,255,.55), transparent 70%),
+    radial-gradient(ellipse 90px 30px at 70% 20%, rgba(255,255,255,.5), transparent 70%),
+    radial-gradient(ellipse 70px 26px at 45% 60%, rgba(255,255,255,.45), transparent 70%),
+    radial-gradient(ellipse 110px 34px at 85% 70%, rgba(255,255,255,.4), transparent 70%),
+    radial-gradient(ellipse 50px 20px at 10% 80%, rgba(255,255,255,.5), transparent 70%);
+  background-size: 340px 260px; animation: st-caus 7s linear infinite; }
+@keyframes st-caus { to { background-position: 340px 130px; } }
+.st-floor { opacity: 0; background: linear-gradient(180deg, rgba(8,17,19,0) 45%, var(--hold) 100%); }
+.st-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.st-drift { position: absolute; left: 0; top: 0; will-change: transform; opacity: 0; pointer-events: none; }
+.st-drift img { display: block; width: 100%; height: auto; }
+.st-drift.far img { filter: blur(2.5px) brightness(.55) saturate(.8); }
+.st-drift.mid img { filter: blur(.6px) brightness(.8); }
+
+/* Apertura: nombre, lema y redes */
+.st-title { display: grid; place-content: center; justify-items: center; text-align: center; padding: 0 16px; }
+.st-portrait .st-title { place-content: end center; padding-bottom: 15vh; }
+.st-title > * { pointer-events: auto; }
+.st-title .tag { justify-content: center; text-shadow: 0 1px 2px rgba(8,17,19,.9), 0 0 14px rgba(8,17,19,.85); }
+.st-title h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(56px, 11vw, 150px); line-height: .95; margin: 14px 0 6px; color: var(--glow);
+  text-shadow: 0 0 8px rgba(111,245,216,.9), 0 0 30px rgba(111,245,216,.55), 0 0 80px rgba(111,245,216,.35); }
+.st-title .motto { margin: 0; text-shadow: 0 1px 2px rgba(8,17,19,.9), 0 0 14px rgba(8,17,19,.85); }
+.st-on h1 { animation: neon 1.4s ease-out both; }
+.st-socials { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 4px; margin-top: 22px; }
+.st-socials a { --c: var(--ink); display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--c); transition: transform .2s, filter .2s; }
+.st-socials svg { width: 21px; height: 21px; fill: currentColor; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--c) 65%, transparent)) drop-shadow(0 1px 2px rgba(0,0,0,.9)); }
+.st-socials a:hover, .st-socials a:focus-visible { transform: translateY(-3px) scale(1.12); filter: brightness(1.25); }
+.st-socials .tw { --c: #a970ff; } .st-socials .dc { --c: #7983f5; } .st-socials .yt { --c: #ff4b4b; } .st-socials .tt { --c: #e9fefd; }
+.st-socials .tt svg { filter: drop-shadow(-1px 0 0 #25f4ee) drop-shadow(1px 0 0 #fe2c55) drop-shadow(0 1px 2px rgba(0,0,0,.9)); }
+.st-socials .ig { --c: #f56040; } .st-socials .xx { --c: #e7e9ea; } .st-socials .sp { --c: #1ed760; }
+.st-live { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 6px 12px; border-radius: var(--r); background: var(--live); color: #fff; text-decoration: none;
+  font-family: var(--f-label); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 18px rgba(255,79,79,.6); }
+.st-live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: pulse 1.4s infinite; }
+.st-live[hidden] { display: none; }
+.st-hint { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); text-align: center; pointer-events: none;
+  font-family: var(--f-label); font-weight: 600; letter-spacing: 4px; text-transform: uppercase; font-size: 13px; color: var(--ink); opacity: .85; }
+.st-hint b { display: block; margin: 8px auto 0; width: 22px; height: 22px; color: var(--brass); font-size: 20px; line-height: 1; animation: st-bob 1.8s ease-in-out infinite; }
+@keyframes st-bob { 50% { transform: translateY(7px); } }
+
+/* Capítulos bajo el agua */
+.st-ch { display: grid; place-content: center; justify-items: center; text-align: center; padding: 0 16px; opacity: 0; visibility: hidden; }
+.st-ch > * { pointer-events: auto; }
+.st-ch h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(42px, 6vw, 72px); line-height: 1; margin: 0 0 26px; color: var(--orange);
+  text-shadow: 0 0 6px rgba(240,138,44,.9), 0 0 22px rgba(240,138,44,.6), 0 0 60px rgba(240,138,44,.35); }
+.st-ch .sched-days span { display: inline-block; }
+.st-ch .screen { width: min(88vw, 760px); background: none; border: 0; padding: 0; box-shadow: none; }
+.st-ch .frame { box-shadow: 0 0 0 1px rgba(111,245,216,.35), 0 0 40px rgba(111,245,216,.25), 0 30px 80px rgba(0,0,0,.55); }
+.st-ch .screen.is-live .frame { box-shadow: 0 0 0 1px rgba(255,79,79,.7), 0 0 50px rgba(255,79,79,.35), 0 30px 80px rgba(0,0,0,.55); }
+.st-ch .channels { margin-top: 14px; justify-items: center; }
+.st-ch .chan { background: none; border: 0; padding: 4px 0; }
+@media (max-width: 520px) { .st-title .tag { font-size: 11px; letter-spacing: 2px; } .st-socials { gap: 2px; } .st-socials a { width: 38px; height: 38px; } }
+
+.boom-fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+/* Bitácora dentro de la bajada, en lo más hondo: columna vertical que se va bajando */
+.st-bit { display: block; padding: 0; }
+.st-bit-in, .st-bit .doors { position: absolute; inset: 0; display: block; }
+.st-bit .doors { pointer-events: none; }
+.st-bit-head, .st-bit .door { position: absolute; left: 50%; top: 50%; opacity: 0; will-change: translate, opacity; }
+.st-bit-head { width: min(92vw, 640px); text-align: center; }
+.st-bit h2 { margin-bottom: 12px; }
+.st-bit-lede { margin: 0 auto; max-width: 30em; color: var(--mute); }
+.st-bit .door { width: 280px; pointer-events: none; }
+.st-bit .door-more { grid-template-rows: 1fr; opacity: .9; } /* el texto se ve siempre, no hace falta pasar el ratón */
+@media (max-width: 520px) { .st-bit .door { width: 230px; } .st-bit .pool { height: 200px; } .st-bit .bob { width: 160px; margin-left: -80px; } }
+.door.boom .bob, .door.boom .barrel-face { visibility: hidden; }
+
+/* Al entrar desde la explosión de un barril: la página empieza tapada por el agua */
+html.from-sea::after { content: ""; position: fixed; inset: 0; z-index: 9999; background: #081113; pointer-events: none; }
+.sea-reveal { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 10000; pointer-events: none; }
+.sea-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; z-index: 10001; }

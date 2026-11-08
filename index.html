@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,300&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,300&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=3">
 <script type="speculationrules">{"prefetch":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}</script>
 </head>
 <body>
@@ -33,11 +33,6 @@
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M17.8 2.5h3.3l-7.2 8.2 8.4 11.1h-6.6l-5.2-6.8-5.9 6.8H1.3l7.7-8.8L1 2.5h6.8l4.7 6.2 5.3-6.2Zm-1.2 17.4h1.8L7.1 4.4H5.1l11.5 15.5Z"/></symbol>
   <symbol id="i-discord" viewBox="0 0 24 24"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.6 1.3a18.4 18.4 0 0 0-5.6 0L8.6 3a19.7 19.7 0 0 0-4.9 1.5C.6 9.1-.3 13.6.1 18.1a19.9 19.9 0 0 0 6 3l1.3-2a12.9 12.9 0 0 1-2-1l.5-.4a14.2 14.2 0 0 0 12.2 0l.5.4c-.6.4-1.3.7-2 1l1.3 2a19.8 19.8 0 0 0 6-3c.5-5.2-.8-9.7-3.6-13.7ZM8 15.4c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Zm8 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Z"/></symbol>
 </svg>
-<script>
-try { if (!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) && !sessionStorage.getItem("tj-intro")) { document.documentElement.classList.add("intro"); sessionStorage.setItem("tj-intro", "1"); } } catch (e) {}
-setTimeout(function () { document.documentElement.classList.remove("intro"); }, 6000);
-</script>
-<div id="intro" aria-hidden="true"></div>
 <header class="top">
   <div class="wrap">
     <a class="brand" href="index.html" aria-label="Tajochungo, inicio">
@@ -56,93 +51,111 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
 </header>
 
 <main id="inicio">
-  <section class="hero">
-    <div class="hero-water" id="water" aria-hidden="true"></div>
-    <div class="wrap">
-      <div class="hero-text">
-        <span class="tag intro-item" style="--i:0">OTP Gangplank · Streamer español</span>
+  <section class="st-story" id="st-story" aria-label="Portada">
+    <div class="st-stage" id="st-stage">
+      <canvas class="st-room" id="st-room" role="img" aria-label="Gangplank en su camarote, de espaldas, frente a la pantalla"></canvas>
+      <div class="st-layer st-vignette" id="st-vig"></div>
+
+      <div class="st-layer st-title" id="st-title">
+        <a class="st-live" id="st-live" href="https://www.twitch.tv/tajochungo" target="_blank" rel="noopener" hidden>En directo</a>
+        <span class="tag">OTP Gangplank · Streamer español</span>
         <h1>Tajochungo</h1>
-        <p class="motto intro-item" style="--i:1">— Un Tajo de oreja a oreja</p>
-        <p class="lede intro-item" style="--i:2">Mi sueño es ser un gran streamer. Esta es mi página, donde está todo lo que hago: mis proyectos de ahora y los que están por venir.</p>
-        <div class="intro-item" style="--i:3">
-        <div class="socials">
-          <a class="chip tw" href="https://www.twitch.tv/tajochungo" target="_blank" rel="noopener"><svg><use href="#i-twitch"/></svg>Twitch</a>
-          <a class="chip dc" href="https://discord.gg/3dnbpVxPGH" target="_blank" rel="noopener"><svg><use href="#i-discord"/></svg>Discord</a>
-          <a class="chip yt" href="https://www.youtube.com/@Tajochungo" target="_blank" rel="noopener"><svg><use href="#i-youtube"/></svg>YouTube</a>
-          <a class="chip tt" href="https://www.tiktok.com/@tajochungo" target="_blank" rel="noopener"><svg><use href="#i-tiktok"/></svg>TikTok</a>
-          <a class="chip ig" href="https://www.instagram.com/tajochungo" target="_blank" rel="noopener"><svg><use href="#i-instagram"/></svg>Instagram</a>
-          <a class="chip xx" href="https://x.com/tajochungo" target="_blank" rel="noopener"><svg><use href="#i-x"/></svg>X</a>
-          <a class="chip sp" href="https://open.spotify.com/user/31vsihhfgxpq2ytsev3mcqumsfri" target="_blank" rel="noopener"><svg><use href="#i-spotify"/></svg>Spotify</a>
-        </div>
-        </div>
-        <div class="ticker intro-item" style="--i:4" aria-hidden="true">
-          <div class="ticker-track">
-            <span><b>⚓</b> Gangplank y Kled mid/top</span><span><b>⚓</b> Directos cuando salgo del curro</span><a class="tk-link" href="https://discord.gg/3dnbpVxPGH" target="_blank" rel="noopener" tabindex="-1"><span><b>⚓</b> Métete al Discord</span></a><span><b>⚓</b> Gangplank y Kled mid/top</span><span><b>⚓</b> Directos cuando salgo del curro</span><a class="tk-link" href="https://discord.gg/3dnbpVxPGH" target="_blank" rel="noopener" tabindex="-1"><span><b>⚓</b> Métete al Discord</span></a>
-            <span><b>⚓</b> Gangplank y Kled mid/top</span><span><b>⚓</b> Directos cuando salgo del curro</span><a class="tk-link" href="https://discord.gg/3dnbpVxPGH" target="_blank" rel="noopener" tabindex="-1"><span><b>⚓</b> Métete al Discord</span></a><span><b>⚓</b> Gangplank y Kled mid/top</span><span><b>⚓</b> Directos cuando salgo del curro</span><a class="tk-link" href="https://discord.gg/3dnbpVxPGH" target="_blank" rel="noopener" tabindex="-1"><span><b>⚓</b> Métete al Discord</span></a>
-          </div>
+        <p class="motto">— Un Tajo de oreja a oreja —</p>
+        <nav class="st-socials" aria-label="Mis redes">
+          <a class="tw" href="https://www.twitch.tv/tajochungo" target="_blank" rel="noopener" aria-label="Twitch" title="Twitch"><svg><use href="#i-twitch"/></svg></a>
+          <a class="dc" href="https://discord.gg/3dnbpVxPGH" target="_blank" rel="noopener" aria-label="Discord" title="Discord"><svg><use href="#i-discord"/></svg></a>
+          <a class="yt" href="https://www.youtube.com/@Tajochungo" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><svg><use href="#i-youtube"/></svg></a>
+          <a class="tt" href="https://www.tiktok.com/@tajochungo" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok"><svg><use href="#i-tiktok"/></svg></a>
+          <a class="ig" href="https://www.instagram.com/tajochungo" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><svg><use href="#i-instagram"/></svg></a>
+          <a class="xx" href="https://x.com/tajochungo" target="_blank" rel="noopener" aria-label="X" title="X"><svg><use href="#i-x"/></svg></a>
+          <a class="sp" href="https://open.spotify.com/user/31vsihhfgxpq2ytsev3mcqumsfri" target="_blank" rel="noopener" aria-label="Spotify" title="Spotify"><svg><use href="#i-spotify"/></svg></a>
+        </nav>
+      </div>
+      <div class="st-hint" id="st-hint">Baja<b aria-hidden="true">⚓</b></div>
+
+      <div class="st-layer st-sea" id="st-sea"></div>
+      <div class="st-layer st-surface" id="st-surf"></div>
+      <div class="st-layer st-rays" id="st-rays"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="st-layer st-caustics" id="st-caus"></div>
+      <div class="st-drift far" id="st-d1" style="width:120px"><img src="media/barril-lg.webp" alt=""></div>
+      <div class="st-drift mid" id="st-d2" style="width:190px"><img src="media/barril-lg.webp" alt=""></div>
+      <div class="st-drift" id="st-d3" style="width:280px"><img src="media/barril-lg.webp" alt=""></div>
+      <canvas class="st-fx" id="st-fx" aria-hidden="true"></canvas>
+      <div class="st-layer st-floor" id="st-floor"></div>
+      <div class="st-layer st-flash" id="st-flash"></div>
+
+      <div class="st-layer st-ch" id="st-ch1">
+        <div class="sched" id="horario">
+          <h2>Horario</h2>
+          <p class="sched-days" id="week" aria-label="Todos los días menos el miércoles"><span data-dia="1">L</span><span data-dia="2">M</span><span data-dia="3" class="off">X</span><span data-dia="4">J</span><span data-dia="5">V</span><span data-dia="6">S</span><span data-dia="0">D</span></p>
+          <p class="sched-time">18:00 <i>–</i> 00:00</p>
+          <p class="sched-games">LoL y WoW</p>
         </div>
       </div>
 
-      <div class="screen intro-item" style="--i:5" id="screen" aria-live="polite">
-        <div class="frame" id="frame">
-          <video id="offline-video" src="media/offline.mp4" poster="media/offline-poster.webp" autoplay muted loop playsinline></video>
-          <div class="frame-top">
-            <span class="frame-label" id="frame-label">Ahora no estoy en directo</span>
+      <div class="st-layer st-ch" id="st-ch2">
+        <h2>Mi canal</h2>
+        <div class="screen" id="screen" aria-live="polite">
+          <div class="frame" id="frame">
+            <video id="offline-video" src="media/offline.mp4" poster="media/offline-poster.webp" muted loop playsinline preload="none"></video>
+            <div class="frame-top">
+              <span class="frame-label" id="frame-label">Ahora no estoy en directo</span>
+            </div>
+          </div>
+          <div class="channels">
+            <a class="chan" id="tw-card" href="https://www.twitch.tv/tajochungo" target="_blank" rel="noopener">
+              <span class="chan-ico tw"><svg><use href="#i-twitch"/></svg></span>
+              <span class="chan-txt"><span class="chan-name">Twitch</span><span class="chan-sub">tajochungo</span></span>
+              <span class="status" id="tw-state">Offline</span>
+            </a>
           </div>
         </div>
-        <div class="channels">
-          <a class="chan" id="tw-card" href="https://www.twitch.tv/tajochungo" target="_blank" rel="noopener">
-            <span class="chan-ico tw"><svg><use href="#i-twitch"/></svg></span>
-            <span class="chan-txt"><span class="chan-name">Twitch</span><span class="chan-sub">tajochungo</span></span>
-            <span class="status" id="tw-state">Offline</span>
-          </a>
-        </div>
       </div>
-    </div>
-  </section>
-
-  <section class="block sea" id="sea">
-    <div class="wrap">
-      <div class="head reveal">
-        <div><h2 class="h-orange">Bitácora de Tajochungo</h2></div>
-        <p>Entra a lo que te interese. Esto irá creciendo con cada proyecto nuevo.</p>
-      </div>
+      <div class="st-layer st-ch st-bit" id="st-ch3">
+        <div class="st-bit-in">
+          <div class="st-bit-head">
+            <h2>Bitácora de Tajochungo</h2>
+            <p class="st-bit-lede">Entra a lo que te interese. Esto irá creciendo con cada proyecto nuevo.</p>
+          </div>
       <div class="doors">
-        <a class="door reveal" href="sobre-mi.html" style="--d:0">
+        <a class="door" href="sobre-mi.html" style="--d:0">
           <span class="pool" aria-hidden="true">
-            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt="" loading="lazy"></span>
-            <img class="barrel-face" src="avatar.webp" alt="" loading="lazy">
+            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt=""></span>
+            <img class="barrel-face" src="avatar.webp" alt="">
           </span>
           <h3>Sobre mí</h3>
           <span class="door-more"><span><p>Quién soy y a dónde voy.</p><span class="door-go">Entrar →</span></span></span>
         </a>
-        <a class="door reveal" href="stream.html" style="--d:1">
+        <a class="door" href="stream.html" style="--d:1">
           <span class="pool" aria-hidden="true">
-            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt="" loading="lazy"></span>
-            <img class="barrel-face" src="emotes/emote-anim.webp" alt="" loading="lazy">
+            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt=""></span>
+            <img class="barrel-face" src="emotes/emote-anim.webp" alt="">
           </span>
           <h3>Mi stream</h3>
           <span class="door-more"><span><p>Mi historial de streamer.</p><span class="door-go">Entrar →</span></span></span>
         </a>
-        <a class="door reveal" href="lol.html" style="--d:2">
+        <a class="door" href="lol.html" style="--d:2">
           <span class="pool" aria-hidden="true">
-            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt="" loading="lazy"></span>
-            <img class="barrel-face" src="emotes/emote-01.webp" alt="" loading="lazy">
+            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt=""></span>
+            <img class="barrel-face" src="emotes/emote-01.webp" alt="">
           </span>
           <h3>League of Legends</h3>
           <span class="door-more"><span><p>Mis dos cuentas, rango y con qué juego.</p><span class="door-go">Entrar →</span></span></span>
         </a>
-        <a class="door reveal" href="creaciones.html" style="--d:3">
+        <a class="door" href="creaciones.html" style="--d:3">
           <span class="pool" aria-hidden="true">
-            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt="" loading="lazy"></span>
-            <img class="barrel-face" src="emotes/emote-07.webp" alt="" loading="lazy">
+            <span class="bob"><img class="barrel-img" src="media/barril-lg.webp" alt=""></span>
+            <img class="barrel-face" src="emotes/emote-07.webp" alt="">
           </span>
           <h3>Creaciones</h3>
           <span class="door-more"><span><p>Emotes, emblemas y cosas que he hecho para el stream.</p><span class="door-go">Entrar →</span></span></span>
         </a>
       </div>
+        </div>
+      </div>
     </div>
   </section>
+
 
 </main>
 <footer>
@@ -153,7 +166,8 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
 </footer>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="ripples.js"></script>
-<script src="site.js"></script>
+<script src="site.js?v=7"></script>
+<script src="portada.js?v=21"></script>
 
 <script>
 // Ventana de directo: si estoy en Twitch se ve Twitch; si no, el vídeo del camarote.
@@ -170,13 +184,14 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
     el.className = "status" + (live ? " on" : "");
     el.textContent = live ? "En directo" : "Offline";
     document.getElementById("tw-card").classList.toggle("is-live", live);
+    document.getElementById("st-live").hidden = !live;
     if (live === current) return;
     current = live;
     var old = frame.querySelector(".player");
     if (old) old.remove();
     screen.classList.toggle("is-live", live);
     if (!live) {
-      video.hidden = false; try { video.play(); } catch (e) {}
+      video.hidden = false;
       label.className = "frame-label"; label.textContent = "Ahora no estoy en directo";
       return;
     }
@@ -198,21 +213,6 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
 })();
 </script>
 <script>
-// Agua: ondas como en un charco al pasar el ratón o el dedo por la portada
-(function () {
-  if (!window.jQuery || !jQuery.fn.ripples) return;
-  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var $w = jQuery("#water");
-  try { $w.ripples({ resolution: 384, dropRadius: 22, perturbance: 0.025, interactive: false }); } catch (e) { return; }
-  window.TJ && TJ.pauseOffscreen($w, document.querySelector(".hero"));
-  var hero = document.querySelector(".hero"), last = 0;
-  function drop(e, radius, strength) { var r = hero.getBoundingClientRect(); $w.ripples("drop", e.clientX - r.left, e.clientY - r.top, radius, strength); }
-  hero.addEventListener("pointermove", function (e) { var now = performance.now(); if (now - last < 16) return; last = now; drop(e, 16, 0.025); }, { passive: true });
-  hero.addEventListener("pointerdown", function (e) { drop(e, 40, 0.18); }, { passive: true });
-  setInterval(function () { if (document.hidden) return; var r = hero.getBoundingClientRect(); $w.ripples("drop", Math.random() * r.width, Math.random() * r.height, 22, 0.025); }, 6000);
-})();
-</script>
-<script>
 // Barriles con el dedo: el primer toque lo hunde y enseña la imagen, el segundo entra
 (function () {
   var doors = Array.prototype.slice.call(document.querySelectorAll(".door"));
@@ -225,55 +225,6 @@ setTimeout(function () { document.documentElement.classList.remove("intro"); }, 
       d.dispatchEvent(new Event("mouseenter"));
     });
   });
-})();
-</script>
-<script>
-// La bitácora es el mismo charco: el ratón deja ondas y cada barril que se hunde salpica
-(function () {
-  if (!window.jQuery || !jQuery.fn.ripples) return;
-  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var $s = jQuery("#sea"), sea = document.getElementById("sea");
-  try { $s.ripples({ resolution: 768, dropRadius: 20, perturbance: 0.03, interactive: false }); } catch (e) { return; }
-  window.TJ && TJ.pauseOffscreen($s, sea);
-  var last = 0;
-  function dropAt(x, y, r, s) { var b = sea.getBoundingClientRect(); $s.ripples("drop", x - b.left, y - b.top, r, s); }
-  sea.addEventListener("pointermove", function (e) { var n = performance.now(); if (n - last < 30) return; last = n; dropAt(e.clientX, e.clientY, 16, 0.02); }, { passive: true });
-  Array.prototype.forEach.call(document.querySelectorAll(".door"), function (d) {
-    d.addEventListener("mouseenter", function () {
-      var p = d.querySelector(".pool").getBoundingClientRect();
-      dropAt(p.left + p.width / 2, p.bottom - 30, 40, 0.12);
-    });
-  });
-  // los barriles mecen el agua de vez en cuando
-  setInterval(function () {
-    if (document.hidden) return;
-    var pools = document.querySelectorAll(".pool"); if (!pools.length) return;
-    var p = pools[Math.floor(Math.random() * pools.length)].getBoundingClientRect();
-    dropAt(p.left + p.width / 2 + (Math.random() * 60 - 30), p.bottom - 26, 18, 0.02);
-  }, 3500);
-})();
-</script>
-<script>
-// Entrada: cae una gota y la onda descubre el camarote, el nombre se enciende como un neón y el resto entra escalonado
-(function () {
-  var root = document.documentElement;
-  if (!root.classList.contains("intro")) return;
-  var intro = document.getElementById("intro"), hero = document.querySelector(".hero"), hr = hero.getBoundingClientRect();
-  var x = hr.left + hr.width * (window.innerWidth < 620 ? 0.62 : 0.55), y = hr.top + hr.height * 0.32;
-  intro.style.setProperty("--ix", x + "px"); intro.style.setProperty("--iy", y + "px");
-  var maxR = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y)) + 300;
-  setTimeout(function () {
-    try { if (window.jQuery && jQuery.fn.ripples) jQuery("#water").ripples("drop", x - hr.left, y - hr.top, 70, 0.18); } catch (e) {}
-    var t0 = performance.now(), dur = 2000;
-    (function grow(now) {
-      var k = Math.min(1, (now - t0) / dur), ease = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      intro.style.setProperty("--ir", (ease * maxR) + "px");
-      if (k < 1) requestAnimationFrame(grow);
-    })(t0);
-  }, 200);
-  setTimeout(function () { root.classList.add("neon"); }, 900);
-  setTimeout(function () { root.classList.add("go"); }, 1300);
-  setTimeout(function () { root.classList.remove("intro", "neon", "go"); }, 3600);
 })();
 </script>
 </body>
