@@ -343,7 +343,7 @@
 
   // burbujas grabadas (las de Tajo): se preparan cuando ya se ven los barriles, para que estén listas al explotar
   var cover = null, coverSnd = null, okVideo = false;
-  try { okVideo = !!document.createElement("video").canPlayType('video/webm; codecs="vp9"'); } catch (e) {}
+  // el vídeo se veía pixelado en pantallas grandes: siempre se usan las burbujas sueltas de Tajo, nítidas a cualquier tamaño
   var prepared = false;
   function prepare() {
     if (prepared) return; prepared = true;

@@ -565,8 +565,9 @@ header.top { view-transition-name: cabecera; }
 .st-drift.mid img { filter: blur(.6px) brightness(.8); }
 
 /* Apertura: nombre, lema y redes */
-.st-title { display: grid; place-content: center; justify-items: center; text-align: center; padding: 0 16px; }
-.st-portrait .st-title { place-content: end center; padding-bottom: 15vh; }
+.st-title { display: grid; place-content: end center; justify-items: center; text-align: center; padding: 0 16px max(92px, 11vh);
+  background: linear-gradient(180deg, rgba(5,11,12,0) 42%, rgba(5,11,12,.5) 68%, rgba(5,11,12,.82) 100%); } /* el nombre va abajo, en la zona oscura, y se lee sobre cualquier fondo */
+.st-portrait .st-title { padding-bottom: 15vh; }
 .st-title > * { pointer-events: auto; }
 .st-title .tag { justify-content: center; text-shadow: 0 1px 2px rgba(8,17,19,.9), 0 0 14px rgba(8,17,19,.85); }
 .st-title h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(56px, 11vw, 150px); line-height: .95; margin: 14px 0 6px; color: var(--glow);

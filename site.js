@@ -265,7 +265,7 @@
    a su tamaño justo. Con profundidad (lejos: pequeñas y desenfocadas · medio: nítidas · cerca: grandes y desenfocadas)
    y vivas: se balancean y se estiran un poco al subir, como las del vídeo. */
 (function () {
-  var sheet = new Image(), ok = false, rects = [[4, 17, 172, 146], [184, 15, 172, 149], [364, 10, 172, 160], [544, 17, 172, 146], [724, 16, 172, 147], [904, 17, 172, 146]];
+  var sheet = new Image(), ok = false, rects = [[4, 22, 240, 204], [252, 20, 240, 208], [532, 42, 176, 164], [788, 56, 160, 136], [1060, 76, 112, 96], [1324, 90, 80, 68]];
   var PAD = 18, sprites = [[], [], []], BLUR = [0, 1.6, 6];
   sheet.onload = function () {
     for (var v = 0; v < 3; v++) for (var i = 0; i < rects.length; i++) {
@@ -276,6 +276,10 @@
     }
     ok = true;
   };
+  function pick(d) { // la pieza más pequeña que no haya que agrandar (así siempre salen nítidas)
+    var ok2 = []; for (var i = 0; i < rects.length; i++) if (rects[i][2] >= d * .95) ok2.push(i);
+    return ok2.length ? ok2[Math.floor(Math.random() * Math.min(ok2.length, 3)) + Math.max(0, ok2.length - 3)] : Math.floor(Math.random() * 2);
+  }
   window.TJBubbles = {
     load: function () { if (!sheet.src) sheet.src = "media/burbujas-piezas.webp"; },
     ready: function () { return ok; },
@@ -283,7 +287,7 @@
       var base = Math.min(W, H), u = Math.random(), z = u < .3 ? 0 : u < .9 ? 1 : 2; // lejos · medio · cerca
       var d = base * (z === 0 ? .025 + Math.random() * .04 : z === 1 ? .035 + Math.pow(Math.random(), 1.7) * .11 : .16 + Math.random() * .1);
       var sp = z === 0 ? .7 : z === 2 ? 1.5 : 1;
-      return { x: x, y: y, d: d, z: z, si: d > base * .085 ? Math.floor(Math.random() * 4) : Math.floor(Math.random() * 6),
+      return { x: x, y: y, d: d, z: z, si: pick(d),
         v: H * (1.1 + Math.random() * .8) * sp * (.8 + d / base), ph: Math.random() * 6.3, f: 4 + Math.random() * 4,
         rot: (Math.random() - .5) * .5, a: z === 0 ? .4 : z === 2 ? .38 : .62 };
     },
@@ -307,7 +311,7 @@
   // el sonido de la explosión sigue aquí, con el mismo timbre, y se apaga
   // burbujas grabadas (las de Tajo): segunda mitad del vídeo y del sonido
   var vid = null, snd = null, okVideo = false, wide = innerWidth / innerHeight >= 1.3; // el vídeo es apaisado: solo en pantallas anchas
-  try { okVideo = !!document.createElement("video").canPlayType('video/webm; codecs="vp9"'); } catch (e) {}
+  // el vídeo se veía pixelado en pantallas grandes: ahora siempre se usan las burbujas sueltas, nítidas a cualquier tamaño
   if (okVideo && wide) {
     vid = document.createElement("video"); vid.className = "sea-video"; vid.muted = true; vid.playsInline = true; vid.setAttribute("aria-hidden", "true");
     vid.src = "media/burbujas-destapa.webm"; document.body.appendChild(vid);
