@@ -282,6 +282,16 @@
 
   layout(); readScroll();
   stage.classList.add("st-on");
+  var bh = /^#bitacora(?:-(\d))?$/.exec(location.hash);
+  if (bh && window.__stBitStops) {
+    var bn = Math.min(4, Math.max(0, +(bh[1] || 1))), run = story.offsetHeight - vh;
+    document.documentElement.style.scrollBehavior = "auto";
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    var toY = story.offsetTop + run * window.__stBitStops[bn];
+    window.scrollTo(0, toY); readScroll(); cur = lastCur = target;
+    requestAnimationFrame(function () { window.scrollTo(0, toY); readScroll(); cur = lastCur = target; document.documentElement.style.scrollBehavior = ""; });
+    try { history.replaceState(null, "", location.pathname); } catch (e) {}
+  }
   addEventListener("resize", function () { layout(); readScroll(); });
   addEventListener("scroll", readScroll, { passive: true });
   if (reduce) { target = cur = 0; }

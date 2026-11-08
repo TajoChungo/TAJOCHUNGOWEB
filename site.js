@@ -303,7 +303,7 @@
 (function () {
   var root = document.documentElement;
   if (!root.classList.contains("from-sea")) return;
-  try { sessionStorage.removeItem("tj-sea"); } catch (e) {}
+  var quiet = false; try { quiet = sessionStorage.getItem("tj-sea") === "quiet"; sessionStorage.removeItem("tj-sea"); } catch (e) {}
   // el sonido de la explosión sigue aquí, con el mismo timbre, y se apaga
   // burbujas grabadas (las de Tajo): segunda mitad del vídeo y del sonido
   var vid = null, snd = null, okVideo = false, wide = innerWidth / innerHeight >= 1.3; // el vídeo es apaisado: solo en pantallas anchas
@@ -312,8 +312,8 @@
     vid = document.createElement("video"); vid.className = "sea-video"; vid.muted = true; vid.playsInline = true; vid.setAttribute("aria-hidden", "true");
     vid.src = "media/burbujas-destapa.webm"; document.body.appendChild(vid);
   } else if (window.TJBubbles) window.TJBubbles.load();
-  try { snd = new Audio("media/burbujas-destapa.mp3"); snd.volume = .8; var sp = snd.play(); if (sp && sp.catch) sp.catch(function () {}); } catch (e) { snd = null; }
-  if (window.TJSound) window.TJSound.tail(!!snd);
+  if (!quiet) try { snd = new Audio("media/burbujas-destapa.mp3"); snd.volume = .8; var sp = snd.play(); if (sp && sp.catch) sp.catch(function () {}); } catch (e) { snd = null; }
+  if (window.TJSound && !quiet) window.TJSound.tail(!!snd);
   var c = document.createElement("canvas"); c.className = "sea-reveal"; c.setAttribute("aria-hidden", "true");
   document.body.appendChild(c);
   var dpr = Math.min(window.devicePixelRatio || 1, 2), W = innerWidth, H = innerHeight, g = c.getContext("2d");
@@ -357,4 +357,10 @@
     g.globalAlpha = 1;
     if (t < .85) requestAnimationFrame(frame); else c.remove();
   })(start);
+})();
+
+/* «Volver a la Bitácora»: vuelve a la portada, justo al barril del que saliste, entrando entre burbujas */
+(function () {
+  var a = document.querySelector("a[data-sea-back]"); if (!a) return;
+  a.addEventListener("click", function () { try { sessionStorage.setItem("tj-sea", "quiet"); } catch (e) {} });
 })();
