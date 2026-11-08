@@ -446,8 +446,6 @@
         var fa = Math.min(1, T / .05) * Math.max(0, 1 - T / .8) * .28; if (fa <= 0) continue;
         g.globalAlpha = fa; g.drawImage(FOAM, q.x - q.r, q.y - q.r, q.r * 2, q.r * 2); g.globalAlpha = 1;
       }
-      // onda de choque, apenas un brillo que pasa
-      if (T < .25) { var sr = size * .35 + T * 1700; g.strokeStyle = "rgba(210,255,246," + (1 - T / .25) * .16 + ")"; g.lineWidth = 3; g.beginPath(); g.arc(ex, ey, sr, 0, 6.283); g.stroke(); }
       // burbujas: primero salen disparadas; después la espuma se convierte en burbujas que suben
       emitT += dt;
       if (T < .7) while (emitT > .012) { emitT -= .012; var ba = rnd(0, 6.283), rr = Math.sqrt(Math.random()) * size * (.15 + T * .6); bubbles.push({ x: ex + Math.cos(ba) * rr, y: ey + Math.sin(ba) * rr, vx: Math.cos(ba) * rnd(20, T < .1 ? 500 : 120), vy: Math.sin(ba) * rnd(20, 160) - rnd(30, 120), r: .7 + Math.pow(Math.random(), 2.4) * 7, ph: rnd(0, 6.3), born: T }); }
