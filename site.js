@@ -285,7 +285,7 @@
     load: function () { if (!sheet.src) sheet.src = "media/burbujas-piezas.webp"; },
     ready: function () { return ok; },
     make: function (W, H, x, y) {
-      var base = Math.min(W, H), u = Math.random(), z = u < .3 ? 0 : u < .9 ? 1 : 2; // lejos · medio · cerca
+      var base = Math.min(W, H), u = Math.random(), z = u < .3 ? 0 : u < .94 ? 1 : 2; // lejos · medio · cerca
       var d = base * (z === 0 ? .025 + Math.random() * .04 : z === 1 ? .035 + Math.pow(Math.random(), 1.7) * .11 : .16 + Math.random() * .1);
       var sp = z === 0 ? .7 : z === 2 ? 1.5 : 1;
       return { x: x, y: y, d: d, z: z, si: pick(d),
@@ -321,7 +321,7 @@
   if (window.TJSound && !quiet) window.TJSound.tail(!!snd);
   var c = document.createElement("canvas"); c.className = "sea-reveal"; c.setAttribute("aria-hidden", "true");
   document.body.appendChild(c);
-  var dpr = Math.min(window.devicePixelRatio || 1, 2), W = innerWidth, H = innerHeight, g = c.getContext("2d");
+  var dpr = Math.min(window.devicePixelRatio || 1, 1.25), W = innerWidth, H = innerHeight, g = c.getContext("2d");
   c.width = W * dpr; c.height = H * dpr;
   // burbuja turquesa, igual que las de la portada
   var R = 48, size = 104, s = document.createElement("canvas"); s.width = s.height = size; var x = s.getContext("2d"), o = size / 2;
@@ -335,7 +335,7 @@
   for (i = 0; i < Math.round(W * H / 2600); i++) bubbles.push({ x: Math.random() * W, y: Math.random() * H * 1.1, v: 700 + Math.random() * 1100, r: 1 + Math.pow(Math.random(), 2) * 13, ph: Math.random() * 6.3 });
   root.classList.remove("from-sea");
   var TB = !vid && window.TJBubbles, mine = [];
-  if (TB) for (i = 0; i < Math.round(TB.density(W, H) * 1.15); i++) mine.push(TB.make(W, H, Math.random() * W, Math.random() * H * 1.35));
+  if (TB) { for (i = 0; i < Math.min(180, Math.round(TB.density(W, H) * 1.15)); i++) mine.push(TB.make(W, H, Math.random() * W, Math.random() * H * 1.35)); mine.sort(function (p, q) { return p.z - q.z; }); }
   var start = performance.now(), last = start, waiting = !!vid || !!TB;
   if (TB) { var tw0 = performance.now(); (function wait() { if (TB.ready() || performance.now() - tw0 > 600) { waiting = false; start = performance.now(); if (!TB.ready()) TB = null; } else setTimeout(wait, 30); })(); }
   if (TB) bubbles.length = 0; // con las burbujas de Tajo no hacen falta las mías
@@ -358,7 +358,7 @@
       g.globalAlpha = .85 * Math.max(0, 1 - t / .8); g.drawImage(s, b.x + Math.sin(b.ph) * b.r - w / 2, b.y - w / 2, w, w);
     }
     g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
-    if (TB) { mine.sort(function (p, q) { return p.z - q.z; }); for (i = 0; i < mine.length; i++) { TB.step(mine[i], dt); TB.draw(g, mine[i], Math.min(1, 1.6 - t * 1.4)); } }
+    if (TB) { for (i = 0; i < mine.length; i++) { TB.step(mine[i], dt); TB.draw(g, mine[i], Math.min(1, 1.6 - t * 1.4)); } }
     g.globalAlpha = 1;
     if (t < .85) requestAnimationFrame(frame); else c.remove();
   })(start);

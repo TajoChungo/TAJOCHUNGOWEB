@@ -33,7 +33,7 @@
 
   /* Burbujas, nieve marina y motas */
   var canvas = $("st-fx"), ctx = canvas.getContext("2d");
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  dpr = Math.min(window.devicePixelRatio || 1, 1.5); // en pantallas muy nítidas no hace falta el doble: mismo aspecto, la mitad de trabajo
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
   // Una burbuja de verdad: casi transparente por dentro, borde fino que brilla,
@@ -168,7 +168,6 @@
       var sink = clamp(vSigned * (story.offsetHeight - vh) * .35, -900, 1600);
       var light = (.55 + .45 * (1 - d)) * (1 - .45 * deep);
 
-      ctx.globalCompositeOperation = "screen";
       // nieve marina: motitas que flotan casi quietas
       for (i = 0; i < snow.length; i++) {
         var q = snow[i], par = .35 + q.z * .9;
@@ -211,7 +210,7 @@
     g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = "#050b0c"; g.fillRect(0, 0, room.width, room.height);
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.translate(L + dx + fx, T + dy + fy); g.rotate(roll * Math.PI / 180); g.scale(scale, scale); g.translate(-fx, -fy);
-    g.imageSmoothingQuality = "high";
+    g.imageSmoothingQuality = "medium";
     g.drawImage(photo, 0, 0, w, h);
     if (portrait) { // en vertical la foto se funde con el negro arriba y abajo
       var band = h * .14, gt = g.createLinearGradient(0, 0, 0, band), gb = g.createLinearGradient(0, h - band, 0, h);
