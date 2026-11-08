@@ -365,9 +365,10 @@
       g.globalAlpha = .85 * Math.max(0, 1 - t / .8); g.drawImage(s, b.x + Math.sin(b.ph) * b.r - w / 2, b.y - w / 2, w, w);
     }
     g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
-    if (TB) { for (i = 0; i < mine.length; i++) { TB.step(mine[i], dt); TB.draw(g, mine[i], Math.min(1, 1.6 - t * 1.4)); } }
+    var fadeB = Math.max(0, Math.min(1, 1 - (t - .4) / .7)); fadeB = fadeB * fadeB * (3 - 2 * fadeB); // se desvanecen suave hasta desaparecer
+    if (TB) { for (i = 0; i < mine.length; i++) { TB.step(mine[i], dt); TB.draw(g, mine[i], fadeB); } }
     g.globalAlpha = 1;
-    if (t < .85) requestAnimationFrame(frame); else c.remove();
+    if (t < 1.12) requestAnimationFrame(frame); else c.remove(); // termina cuando ya no queda nada a la vista
   })(start);
 })();
 
