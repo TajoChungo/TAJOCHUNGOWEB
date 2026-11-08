@@ -240,22 +240,9 @@
       var on = false, inWater = false, depth = 0, nodes = null, timers = [];
       function build() {
         var t = A.currentTime;
-        var lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 2400; lp.Q.value = .6;
+        var lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 20000; // sin tocar: el sonido tal cual
         var vol = A.createGain(); vol.gain.value = 0;
-        lp.connect(vol); vol.connect(toneNode);
-        var send = A.createGain(); send.gain.value = .35; vol.connect(send); send.connect(wet);
-        // el mar por dentro: solo graves, muy filtrados (sin siseo: el siseo es lo que sonaba a aire)
-        var r = A.createBufferSource(); r.buffer = brown; r.loop = true;
-        var l1 = A.createBiquadFilter(); l1.type = "lowpass"; l1.frequency.value = 95; l1.Q.value = .5;
-        var l2 = A.createBiquadFilter(); l2.type = "lowpass"; l2.frequency.value = 95; l2.Q.value = .5;
-        var sea = A.createGain(); sea.gain.value = 0;
-        var swayG = A.createGain(); swayG.gain.value = 1; // respira despacio
-        var lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = .08; lg.gain.value = .35; lfo.connect(lg); lg.connect(swayG.gain);
-        r.connect(l1); l1.connect(l2); l2.connect(swayG); swayG.connect(sea); sea.connect(lp); r.start(t); lfo.start(t);
-        // presión del agua: dos tonos muy graves casi iguales que «laten» (como un zumbido en los oídos al bucear)
-        var drone = A.createGain(); drone.gain.value = 0;
-        [[47, .5], [48.4, .5], [71, .18]].forEach(function (f) { var o = A.createOscillator(), g = A.createGain(); o.type = "sine"; o.frequency.value = f[0]; g.gain.value = f[1]; o.connect(g); g.connect(drone); o.start(t); });
-        drone.connect(lp);
+        lp.connect(vol); vol.connect(masterNode); // directo, sin eco ni filtros
         // el barco: el sonido grabado de Tajo (madera del casco crujiendo), en bucle sin cortes
         var ship = A.createGain(); ship.gain.value = 0; ship.connect(lp);
         try {
@@ -263,7 +250,7 @@
             return new Promise(function (ok, ko) { A.decodeAudioData(ab, ok, ko); });
           }).then(function (buf) { var s = A.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(ship); s.start(); }).catch(function () {});
         } catch (e) {}
-        nodes = { lp: lp, vol: vol, sea: sea, drone: drone, ship: ship };
+        nodes = { lp: lp, vol: vol, ship: ship };
       }
       // un crujido de madera: roce a tirones (como una tabla o una cuerda tensa) con resonancias de madera
       function creak(level) {
@@ -287,12 +274,9 @@
       }
       function apply() {
         if (!nodes) return;
-        var t = A.currentTime, d = depth;
-        nodes.lp.frequency.setTargetAtTime(inWater ? 1400 - d * 1000 : 2400, t, .4); // cuanto más hondo, más sordo
+        var t = A.currentTime;
         nodes.vol.gain.setTargetAtTime(on ? 1 : 0, t, .8);
-        nodes.sea.gain.setTargetAtTime(inWater ? .1 + d * .05 : 0, t, .9);
-        nodes.drone.gain.setTargetAtTime(inWater ? .012 + d * .008 : 0, t, 1.2);
-        nodes.ship.gain.setTargetAtTime(inWater ? .22 * (1 - d * .5) : .4, t, .8); // en el camarote, claro; bajo el agua, el casco a lo lejos
+        nodes.ship.gain.setTargetAtTime(.7, t, .8); // solo el sonido del barco de Tajo, igual en toda la bajada
       }
       return {
         start: function () {
@@ -300,10 +284,6 @@
           if (A.state === "suspended") A.resume();
           if (!nodes) {
             build();
-            loop("bub", 1600, 4200, function () {
-              if (!inWater) return; var t0 = A.currentTime + .02, n = Math.random() < .35 ? Math.floor(rnd(3, 8)) : 1;
-              for (var k = 0; k < n; k++) bubble(t0 + k * rnd(.05, .14), rnd(.01, .026) * (1 - k / (n + 2)));
-            });
           }
           apply();
         },
