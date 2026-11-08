@@ -99,6 +99,7 @@
   if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(stage);
   function render(now) { if (visible || target < 1) frame(now); else t0 = now; requestAnimationFrame(render); }
   function frame(now) {
+    if (window.__stPause) { t0 = now; return; } // explotando un barril: todo el trabajo para la explosión
     var dt = Math.min(50, now - t0) / 1000; t0 = now;
     cur += (target - cur) * (1 - Math.pow(0.0015, dt)); // suavizado
     var P = cur, vSigned = (P - lastCur) / Math.max(dt, .001); lastCur = P;
@@ -305,8 +306,10 @@
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var doors = Array.prototype.slice.call(document.querySelectorAll("#st-ch3 .door"));
   if (!doors.length) return;
-  var fx = null, g = null, busy = false;
+  var fx = null, g = null, busy = false, coverEl = null;
   function rnd(a, b) { return a + Math.random() * (b - a); }
+  function blob(r, gC, gE) { var c = document.createElement("canvas"); c.width = c.height = r * 2; var x = c.getContext("2d"), gr = x.createRadialGradient(r, r, 0, r, r, r); gr.addColorStop(0, gC); gr.addColorStop(.55, gE); gr.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = gr; x.fillRect(0, 0, r * 2, r * 2); return c; }
+  var FOAM = blob(64, "rgba(200,248,238,1)", "rgba(140,225,210,.5)"), SILT = blob(64, "rgba(70,105,102,1)", "rgba(70,105,102,.45)");
   function seg(p, a, b) { return Math.min(1, Math.max(0, (p - a) / (b - a))); }
 
   // --- romper el barril en trozos irregulares (cortes al azar, como madera que revienta) ---
@@ -337,7 +340,9 @@
       var x = c.getContext("2d"); x.beginPath(); poly.forEach(function (q, i) { i ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); }); x.closePath();
       x.save(); x.clip(); x.drawImage(img, 0, 0, w, h); x.restore();
       x.strokeStyle = "rgba(20,12,6,.55)"; x.lineWidth = 1.2; x.stroke(); // canto astillado
-      return { c: c, cen: centroid(poly), a: area(poly) };
+      var dk = document.createElement("canvas"); dk.width = c.width; dk.height = c.height; var y = dk.getContext("2d");
+      y.drawImage(c, 0, 0); y.globalCompositeOperation = "source-atop"; y.fillStyle = "rgba(4,10,12,.5)"; y.fillRect(0, 0, dk.width, dk.height);
+      return { c: c, dk: dk, cen: centroid(poly), a: area(poly) };
     });
   }
 
@@ -350,6 +355,7 @@
     coverSnd = new Audio("media/burbujas-tapa.mp3"); coverSnd.preload = "auto"; coverSnd.volume = .8;
     try { fetch("media/burbujas-destapa.mp3"); } catch (e) {}
     if (window.TJBubbles) window.TJBubbles.load();
+    if (window.TJSound && window.TJSound.warm) window.TJSound.warm();
     if (!okVideo || innerWidth / innerHeight < 1.3) return; // el vídeo es apaisado: solo en pantallas anchas
     cover = document.createElement("video"); cover.className = "sea-video"; cover.muted = true; cover.playsInline = true; cover.preload = "auto";
     cover.setAttribute("aria-hidden", "true"); cover.src = "media/burbujas-tapa.webm"; cover.style.visibility = "hidden"; document.body.appendChild(cover);
@@ -361,26 +367,35 @@
   function boomSound() { if (window.TJSound) window.TJSound.boom(sndReady()); } // el sonido vive en site.js
 
   function explode(door, href) {
-    if (busy) return; busy = true; boomSound();
+    if (busy) return; busy = true; window.__stPause = true; boomSound();
     var withVideo = useFile();
     var withSnd = sndReady(), TB = !withVideo && window.TJBubbles && window.TJBubbles.ready() ? window.TJBubbles : null;
     setTimeout(function () { // termina de tapar justo al cambiar de página
       if (withVideo) { cover.currentTime = 0; cover.style.visibility = "visible"; var cp = cover.play(); if (cp && cp.catch) cp.catch(function () {}); }
       if (withSnd) try { coverSnd.currentTime = 0; var ap = coverSnd.play(); if (ap && ap.catch) ap.catch(function () {}); } catch (e) {}
     }, 130);
-    if (!fx) { fx = document.createElement("canvas"); fx.className = "boom-fx"; fx.setAttribute("aria-hidden", "true"); document.body.appendChild(fx); g = fx.getContext("2d"); }
-    var dpr = Math.min(window.devicePixelRatio || 1, 2), W = innerWidth, H = innerHeight;
+    if (!fx) {
+      coverEl = document.createElement("div"); coverEl.className = "boom-cover"; document.body.appendChild(coverEl);
+      fx = document.createElement("canvas"); fx.className = "boom-fx"; fx.setAttribute("aria-hidden", "true"); document.body.appendChild(fx); g = fx.getContext("2d", { desynchronized: true });
+    }
+    coverEl.style.opacity = 0;
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.25), W = innerWidth, H = innerHeight;
     fx.width = W * dpr; fx.height = H * dpr;
     var img = door.querySelector(".barrel-img"), r = img.getBoundingClientRect();
     var size = r.width, ex = r.left + r.width * rnd(.45, .55), ey = r.top + r.height * rnd(.5, .6); // la pólvora está dentro, un poco abajo
     var pieces = shatter(img, r.width, r.height).map(function (p) {
       var px = r.left + p.cen[0], py = r.top + p.cen[1], ang = Math.atan2(py - ey, px - ex) + rnd(-.5, .5);
       var sp = rnd(190, 520) * Math.min(1.6, Math.max(.55, 900 / Math.sqrt(p.a + 1) / 18));
-      return { c: p.c, ox: p.cen[0], oy: p.cen[1], x: px, y: py, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 30, rot: 0, vr: rnd(-7, 7), tum: rnd(0, 6.3), vt: rnd(-9, 9), z: Math.random() < .3 ? rnd(.5, 1) : rnd(-1, .3) };
+      return { c: p.c, dk: p.dk, ox: p.cen[0], oy: p.cen[1], x: px, y: py, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 30, rot: 0, vr: rnd(-7, 7), tum: rnd(0, 6.3), vt: rnd(-9, 9), z: Math.random() < .3 ? rnd(.5, 1) : rnd(-1, .3) };
     });
     var splinters = [], foam = [], bubbles = [], i;
     for (i = 0; i < 26; i++) { var a = rnd(0, 6.283), v = rnd(260, 700); splinters.push({ x: ex, y: ey, vx: Math.cos(a) * v, vy: Math.sin(a) * v, rot: a, vr: rnd(-14, 14), l: rnd(5, 16), c: Math.random() < .5 ? "#6e4a2c" : "#4a3220" }); }
     for (i = 0; i < 38; i++) { var a2 = rnd(0, 6.283), v2 = rnd(60, 300); foam.push({ x: ex + rnd(-6, 6), y: ey + rnd(-6, 6), vx: Math.cos(a2) * v2, vy: Math.sin(a2) * v2 * .85, r: rnd(10, 26), g: rnd(30, 70) }); }
+    pieces.forEach(function (pc) {
+      if (pc.z <= .4) return;
+      var bl = document.createElement("canvas"); bl.width = pc.c.width + 20; bl.height = pc.c.height + 20; var bx = bl.getContext("2d");
+      if ("filter" in bx) { bx.filter = "blur(5px)"; bx.drawImage(pc.c, 10, 10); pc.bl = bl; }
+    });
     door.classList.add("boom");
     var spr = window.__stBubble, start = performance.now(), last = start, emitT = 0, wall = [], near = null;
     var stage = document.getElementById("st-stage"), shakeEnd = start + 380;
@@ -397,11 +412,12 @@
         var pa = Math.max(0, 1 - Math.max(0, T - .8) / .5); if (pa <= 0) continue;
         var zs = Math.max(.45, 1 + pc.z * T * 1.1); // hacia la cámara crece, hacia el fondo encoge
         g.save(); g.globalAlpha = pa; g.translate(pc.x, pc.y); g.rotate(pc.rot); g.scale((.55 + .45 * Math.abs(Math.cos(pc.tum))) * zs, zs); // da vueltas sobre sí mismo
-        var dark = Math.min(.45, T * .5) + (pc.z < 0 ? -pc.z * .25 : 0), blur = pc.z > .4 ? (pc.z * T * 7).toFixed(1) : 0;
-        g.filter = "brightness(" + (1 - dark).toFixed(2) + ")" + (blur ? " blur(" + blur + "px)" : "");
-        g.drawImage(pc.c, -pc.ox, -pc.oy); g.restore();
+        var dark = Math.min(1, T * 1.1 + (pc.z < 0 ? -pc.z * .5 : 0));
+        g.drawImage(pc.c, -pc.ox, -pc.oy);
+        if (dark > .02) { g.globalAlpha = pa * dark; g.drawImage(pc.dk, -pc.ox, -pc.oy); } // se oscurece al hundirse
+        if (pc.bl && pc.z > .4) { g.globalAlpha = pa * Math.min(1, pc.z * T * 2.2); g.drawImage(pc.bl, -pc.ox - 10, -pc.oy - 10); } // desenfoque al acercarse
+        g.restore();
       }
-      g.filter = "none";
       // astillas finas
       for (i = 0; i < splinters.length; i++) {
         var s = splinters[i], sd = Math.exp(-4 * dt); s.vx *= sd; s.vy = s.vy * sd + 40 * dt; s.x += s.vx * dt; s.y += s.vy * dt; s.rot += s.vr * dt;
@@ -428,9 +444,7 @@
       for (i = 0; i < foam.length; i++) {
         var q = foam[i], fd = Math.exp(-3.6 * dt); q.vx *= fd; q.vy = q.vy * fd - 70 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.r += q.g * dt;
         var fa = Math.min(1, T / .05) * Math.max(0, 1 - T / .8) * .28; if (fa <= 0) continue;
-        var gg = g.createRadialGradient(q.x, q.y, 0, q.x, q.y, q.r);
-        gg.addColorStop(0, "rgba(200,248,238," + fa + ")"); gg.addColorStop(.55, "rgba(140,225,210," + fa * .5 + ")"); gg.addColorStop(1, "rgba(150,225,212,0)");
-        g.fillStyle = gg; g.beginPath(); g.arc(q.x, q.y, q.r, 0, 6.283); g.fill();
+        g.globalAlpha = fa; g.drawImage(FOAM, q.x - q.r, q.y - q.r, q.r * 2, q.r * 2); g.globalAlpha = 1;
       }
       // onda de choque, apenas un brillo que pasa
       if (T < .25) { var sr = size * .35 + T * 1700; g.strokeStyle = "rgba(210,255,246," + (1 - T / .25) * .16 + ")"; g.lineWidth = 3; g.beginPath(); g.arc(ex, ey, sr, 0, 6.283); g.stroke(); }
@@ -445,8 +459,8 @@
       g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
       var cov = seg(real, .36, .88);
       if (cov > 0) {
-        g.fillStyle = "rgba(8,17,19," + Math.pow(cov, 1.5).toFixed(3) + ")"; g.fillRect(0, 0, W, H);
-        if (TB) { var nt = TB.density(W, H) * 2.3 * dt * (.5 + cov); while (nt > 0) { if (Math.random() < nt) wall.push(TB.make(W, H, rnd(-20, W + 20), H + rnd(20, 120))); nt -= 1; } }
+        coverEl.style.opacity = Math.pow(cov, 1.5).toFixed(3); // oscurecer con una capa (no se pinta en cada fotograma)
+        if (TB) { var nt = TB.density(W, H) * 2.3 * dt * (.5 + cov); while (nt > 0 && wall.length < 170) { if (Math.random() < nt) wall.push(TB.make(W, H, rnd(-20, W + 20), H + rnd(20, 120))); nt -= 1; } }
         else { var nw = Math.round(W / 22 * dt / .016 * (.4 + cov));
         for (i = 0; i < nw; i++) wall.push({ x: rnd(-20, W + 20), y: H + rnd(10, 80), v: rnd(900, 1700), r: 1 + Math.pow(Math.random(), 2) * 13, ph: rnd(0, 6.3) }); }
       }
@@ -473,7 +487,7 @@
     })(start);
     setTimeout(function () { try { sessionStorage.setItem("tj-sea", "1"); } catch (e) {} location.href = href; }, 930);
     // si se vuelve con «atrás», el barril está entero otra vez
-    addEventListener("pageshow", function () { busy = false; door.classList.remove("boom"); if (cover) { cover.pause(); cover.style.visibility = "hidden"; } if (g) g.clearRect(0, 0, fx.width, fx.height); }, { once: true });
+    addEventListener("pageshow", function () { busy = false; window.__stPause = false; if (coverEl) coverEl.style.opacity = 0; door.classList.remove("boom"); if (cover) { cover.pause(); cover.style.visibility = "hidden"; } if (g) g.clearRect(0, 0, fx.width, fx.height); }, { once: true });
   }
   addEventListener("pageswap", function (e) { if (busy && e.viewTransition) e.viewTransition.skipTransition(); });
   doors.forEach(function (d) {

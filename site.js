@@ -225,6 +225,7 @@
     return g;
   }
   window.TJSound = {
+    warm: function () { try { setup(); } catch (e) {} }, // prepara el eco y los ruidos antes de que hagan falta
     // el golpe (portada). Devuelve cuándo termina para que la página nueva lo continúe
     boom: function (fileBubbles) {
       if (!setup()) return; if (A.state === "suspended") A.resume();

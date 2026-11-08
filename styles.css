@@ -603,6 +603,7 @@ header.top { view-transition-name: cabecera; }
 .st-ch .chan { background: none; border: 0; padding: 4px 0; }
 @media (max-width: 520px) { .st-title .tag { font-size: 11px; letter-spacing: 2px; } .st-socials { gap: 2px; } .st-socials a { width: 38px; height: 38px; } }
 
+.boom-cover { position: fixed; inset: 0; background: #081113; opacity: 0; pointer-events: none; z-index: 49; }
 .boom-fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
 
 /* Bitácora dentro de la bajada, en lo más hondo: columna vertical que se va bajando */
