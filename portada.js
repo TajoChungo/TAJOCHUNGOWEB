@@ -453,7 +453,8 @@
         if (al > 0) { g.globalAlpha = al; g.drawImage(spr.img, b.x + Math.sin(b.ph) * b.r * .6 - w / 2, b.y - w / 2, w, w); }
       }
       g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
-      var cov = seg(real, .36, .88);
+      var cov = seg(real, .36, .86);
+      var endFade = 1 - seg(real, .8, .98); fx.style.opacity = (endFade * endFade * (3 - 2 * endFade)).toFixed(3); // al final solo queda el negro
       if (cov > 0) {
         coverEl.style.opacity = Math.pow(cov, 1.5).toFixed(3); // oscurecer con una capa (no se pinta en cada fotograma)
         if (TB) { var nt = TB.density(W, H) * 2.3 * dt * (.5 + cov); while (nt > 0 && wall.length < 170) { if (Math.random() < nt) wall.push(TB.make(W, H, rnd(-20, W + 20), H + rnd(20, 120))); nt -= 1; } }
@@ -479,20 +480,16 @@
         }
         g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
       }
-      if (real < .95) requestAnimationFrame(frame);
+      if (real < 1.05) requestAnimationFrame(frame);
     })(start);
     setTimeout(function () {
       try {
         sessionStorage.setItem("tj-sea", "1");
-        // las burbujas pasan tal cual a la página nueva y siguen subiendo desde donde estaban (no se repite la animación)
-        if (TB && wall.length) sessionStorage.setItem("tj-sea-wall", JSON.stringify({ W: W, H: H, b: wall.filter(function (q) { return q.y > -q.d; }).map(function (q) {
-          return [Math.round(q.x), Math.round(q.y), +q.d.toFixed(1), q.z, q.si, Math.round(q.v * 1.16), +q.ph.toFixed(2), +q.f.toFixed(2), +q.rot.toFixed(2), q.a];
-        }) }));
       } catch (e) {}
       location.href = href;
-    }, 930);
+    }, 1000);
     // si se vuelve con «atrás», el barril está entero otra vez
-    addEventListener("pageshow", function () { busy = false; window.__stPause = false; if (coverEl) coverEl.style.opacity = 0; door.classList.remove("boom"); if (cover) { cover.pause(); cover.style.visibility = "hidden"; } if (g) g.clearRect(0, 0, fx.width, fx.height); }, { once: true });
+    addEventListener("pageshow", function () { busy = false; window.__stPause = false; if (coverEl) coverEl.style.opacity = 0; if (fx) fx.style.opacity = 1; door.classList.remove("boom"); if (cover) { cover.pause(); cover.style.visibility = "hidden"; } if (g) g.clearRect(0, 0, fx.width, fx.height); }, { once: true });
   }
   addEventListener("pageswap", function (e) { if (busy && e.viewTransition) e.viewTransition.skipTransition(); });
   doors.forEach(function (d) {

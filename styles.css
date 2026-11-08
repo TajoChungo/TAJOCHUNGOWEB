@@ -622,5 +622,6 @@ header.top { view-transition-name: cabecera; }
 
 /* Al entrar desde la explosión de un barril: la página empieza tapada por el agua */
 html.from-sea::after { content: ""; position: fixed; inset: 0; z-index: 9999; background: #081113; pointer-events: none; }
+html.from-sea.sea-in::after { opacity: 0; transition: opacity .6s ease-out; }
 .sea-reveal { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 10000; pointer-events: none; }
 .sea-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; z-index: 10001; }

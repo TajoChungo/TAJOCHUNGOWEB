@@ -304,75 +304,25 @@
   };
 })();
 
-/* Al llegar desde la explosión de un barril: las burbujas que taparon la pantalla siguen subiendo y descubren la página */
+/* Al llegar desde la explosión de un barril: la página aparece con un fundido suave desde el negro.
+   (Toda la animación de burbujas ocurre en la portada, antes de cambiar: así no hay empalmes ni cortes.)
+   El sonido sí continúa: el retumbar y el burbujeo se apagan aquí. */
 (function () {
   var root = document.documentElement;
   if (!root.classList.contains("from-sea")) return;
-  var quiet = false; try { quiet = sessionStorage.getItem("tj-sea") === "quiet"; sessionStorage.removeItem("tj-sea"); } catch (e) {}
-  // el sonido de la explosión sigue aquí, con el mismo timbre, y se apaga
-  // burbujas grabadas (las de Tajo): segunda mitad del vídeo y del sonido
-  var vid = null, snd = null, okVideo = false, wide = innerWidth / innerHeight >= 1.3; // el vídeo es apaisado: solo en pantallas anchas
-  // el vídeo se veía pixelado en pantallas grandes: ahora siempre se usan las burbujas sueltas, nítidas a cualquier tamaño
-  if (okVideo && wide) {
-    vid = document.createElement("video"); vid.className = "sea-video"; vid.muted = true; vid.playsInline = true; vid.setAttribute("aria-hidden", "true");
-    vid.src = "media/burbujas-destapa.webm"; document.body.appendChild(vid);
-  } else if (window.TJBubbles) window.TJBubbles.load();
-  if (!quiet) try { snd = new Audio("media/burbujas-destapa.mp3"); snd.volume = .8; var sp = snd.play(); if (sp && sp.catch) sp.catch(function () {}); } catch (e) { snd = null; }
-  if (window.TJSound && !quiet) window.TJSound.tail(!!snd);
-  var c = document.createElement("canvas"); c.className = "sea-reveal"; c.setAttribute("aria-hidden", "true");
-  document.body.appendChild(c);
-  var dpr = Math.min(window.devicePixelRatio || 1, 1.25), W = innerWidth, H = innerHeight, g = c.getContext("2d");
-  c.width = W * dpr; c.height = H * dpr;
-  // burbuja turquesa, igual que las de la portada
-  var R = 48, size = 104, s = document.createElement("canvas"); s.width = s.height = size; var x = s.getContext("2d"), o = size / 2;
-  var body = x.createRadialGradient(o, o, 0, o, o, R);
-  body.addColorStop(0, "rgba(60,190,170,0.03)"); body.addColorStop(.72, "rgba(70,205,182,0.06)"); body.addColorStop(.9, "rgba(95,228,200,0.30)"); body.addColorStop(.975, "rgba(140,246,222,0.62)"); body.addColorStop(1, "rgba(140,246,222,0)");
-  x.fillStyle = body; x.beginPath(); x.arc(o, o, R, 0, 6.2832); x.fill();
-  x.save(); x.translate(o - R * .38, o - R * .4); x.rotate(-.7); x.scale(1, .55);
-  var hi = x.createRadialGradient(0, 0, 0, 0, 0, R * .26); hi.addColorStop(0, "rgba(200,255,240,0.75)"); hi.addColorStop(1, "rgba(160,250,228,0)");
-  x.fillStyle = hi; x.beginPath(); x.arc(0, 0, R * .26, 0, 6.2832); x.fill(); x.restore();
-  var k = size / (R * 2), bubbles = [], i;
-  for (i = 0; i < Math.round(W * H / 2600); i++) bubbles.push({ x: Math.random() * W, y: Math.random() * H * 1.1, v: 700 + Math.random() * 1100, r: 1 + Math.pow(Math.random(), 2) * 13, ph: Math.random() * 6.3 });
-  root.classList.remove("from-sea");
-  var TB = !vid && window.TJBubbles, mine = [];
-  if (TB) {
-    // las burbujas vienen de la página anterior, en el mismo sitio: siguen subiendo, no empiezan otra vez
-    var saved = null; try { saved = JSON.parse(sessionStorage.getItem("tj-sea-wall") || "null"); sessionStorage.removeItem("tj-sea-wall"); } catch (e) {}
-    if (saved && saved.b && saved.b.length && Math.abs(saved.W - W) < 40 && Math.abs(saved.H - H) < 120) {
-      saved.b.forEach(function (q) { mine.push({ x: q[0], y: q[1], d: q[2], z: q[3], si: q[4], v: q[5], ph: q[6], f: q[7], rot: q[8], a: q[9] }); });
-    } else for (i = 0; i < Math.min(180, Math.round(TB.density(W, H) * 1.15)); i++) mine.push(TB.make(W, H, Math.random() * W, Math.random() * H * 1.35));
-    mine.sort(function (p, q) { return p.z - q.z; });
+  var quiet = false; try { quiet = sessionStorage.getItem("tj-sea") === "quiet"; sessionStorage.removeItem("tj-sea"); sessionStorage.removeItem("tj-sea-wall"); } catch (e) {}
+  if (!quiet) {
+    var snd = null;
+    try { snd = new Audio("media/burbujas-destapa.mp3"); snd.volume = .8; var sp = snd.play(); if (sp && sp.catch) sp.catch(function () {}); } catch (e) { snd = null; }
+    if (window.TJSound) window.TJSound.tail(!!snd);
   }
-  var start = performance.now(), last = start, waiting = !!vid || !!TB;
-  if (TB) { var tw0 = performance.now(); (function wait() { if (TB.ready() || performance.now() - tw0 > 600) { waiting = false; start = performance.now(); if (!TB.ready()) TB = null; } else setTimeout(wait, 30); })(); }
-  if (TB) bubbles.length = 0; // con las burbujas de Tajo no hacen falta las mías
-  if (vid) {
-    var go = function () { if (!waiting) return; waiting = false; start = performance.now(); };
-    vid.addEventListener("playing", go); setTimeout(go, 700); // si el vídeo tarda, no se espera más
-    vid.addEventListener("ended", function () { vid.remove(); });
-    var vp = vid.play(); if (vp && vp.catch) vp.catch(function () { go(); vid.remove(); });
-    bubbles.length = Math.round(bubbles.length * .25); // las burbujas grabadas hacen el trabajo; quedan unas pocas mías
-  }
-  (function frame(now) {
-    if (waiting) { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = "#081113"; g.fillRect(0, 0, W, H); last = now; requestAnimationFrame(frame); return; }
-    var t = (now - start) / 1000, dt = Math.min(40, now - last) / 1000; last = now;
-    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-    var fade = Math.max(0, 1 - t / .55);
-    g.fillStyle = "rgba(8,17,19," + Math.pow(fade, 1.4).toFixed(3) + ")"; g.fillRect(0, 0, W, H);
-    g.globalCompositeOperation = "screen";
-    for (i = 0; i < bubbles.length; i++) {
-      var b = bubbles[i]; b.y -= b.v * dt; b.ph += dt * 6; var w = b.r * 2 * k;
-      g.globalAlpha = .85 * Math.max(0, 1 - t / .8); g.drawImage(s, b.x + Math.sin(b.ph) * b.r - w / 2, b.y - w / 2, w, w);
-    }
-    g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
-    var fadeB = Math.max(0, Math.min(1, 1 - (t - .4) / .7)); fadeB = fadeB * fadeB * (3 - 2 * fadeB); // se desvanecen suave hasta desaparecer
-    if (TB) { for (i = 0; i < mine.length; i++) { TB.step(mine[i], dt); TB.draw(g, mine[i], fadeB); } }
-    g.globalAlpha = 1;
-    if (t < 1.12) requestAnimationFrame(frame); else c.remove(); // termina cuando ya no queda nada a la vista
-  })(start);
+  requestAnimationFrame(function () { requestAnimationFrame(function () {
+    root.classList.add("sea-in"); // el negro se desvanece
+    setTimeout(function () { root.classList.remove("from-sea", "sea-in"); }, 700);
+  }); });
 })();
 
-/* «Volver a la Bitácora»: vuelve a la portada, justo al barril del que saliste, entrando entre burbujas */
+/* «Volver a la Bitácora»: vuelve a la portada, justo al barril del que saliste, con un fundido */
 (function () {
   var a = document.querySelector("a[data-sea-back]"); if (!a) return;
   a.addEventListener("click", function () { try { sessionStorage.setItem("tj-sea", "quiet"); } catch (e) {} });
