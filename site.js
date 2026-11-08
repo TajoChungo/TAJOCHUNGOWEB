@@ -335,7 +335,14 @@
   for (i = 0; i < Math.round(W * H / 2600); i++) bubbles.push({ x: Math.random() * W, y: Math.random() * H * 1.1, v: 700 + Math.random() * 1100, r: 1 + Math.pow(Math.random(), 2) * 13, ph: Math.random() * 6.3 });
   root.classList.remove("from-sea");
   var TB = !vid && window.TJBubbles, mine = [];
-  if (TB) { for (i = 0; i < Math.min(180, Math.round(TB.density(W, H) * 1.15)); i++) mine.push(TB.make(W, H, Math.random() * W, Math.random() * H * 1.35)); mine.sort(function (p, q) { return p.z - q.z; }); }
+  if (TB) {
+    // las burbujas vienen de la página anterior, en el mismo sitio: siguen subiendo, no empiezan otra vez
+    var saved = null; try { saved = JSON.parse(sessionStorage.getItem("tj-sea-wall") || "null"); sessionStorage.removeItem("tj-sea-wall"); } catch (e) {}
+    if (saved && saved.b && saved.b.length && Math.abs(saved.W - W) < 40 && Math.abs(saved.H - H) < 120) {
+      saved.b.forEach(function (q) { mine.push({ x: q[0], y: q[1], d: q[2], z: q[3], si: q[4], v: q[5], ph: q[6], f: q[7], rot: q[8], a: q[9] }); });
+    } else for (i = 0; i < Math.min(180, Math.round(TB.density(W, H) * 1.15)); i++) mine.push(TB.make(W, H, Math.random() * W, Math.random() * H * 1.35));
+    mine.sort(function (p, q) { return p.z - q.z; });
+  }
   var start = performance.now(), last = start, waiting = !!vid || !!TB;
   if (TB) { var tw0 = performance.now(); (function wait() { if (TB.ready() || performance.now() - tw0 > 600) { waiting = false; start = performance.now(); if (!TB.ready()) TB = null; } else setTimeout(wait, 30); })(); }
   if (TB) bubbles.length = 0; // con las burbujas de Tajo no hacen falta las mías

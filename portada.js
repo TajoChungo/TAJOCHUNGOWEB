@@ -481,7 +481,16 @@
       }
       if (real < .95) requestAnimationFrame(frame);
     })(start);
-    setTimeout(function () { try { sessionStorage.setItem("tj-sea", "1"); } catch (e) {} location.href = href; }, 930);
+    setTimeout(function () {
+      try {
+        sessionStorage.setItem("tj-sea", "1");
+        // las burbujas pasan tal cual a la página nueva y siguen subiendo desde donde estaban (no se repite la animación)
+        if (TB && wall.length) sessionStorage.setItem("tj-sea-wall", JSON.stringify({ W: W, H: H, b: wall.filter(function (q) { return q.y > -q.d; }).map(function (q) {
+          return [Math.round(q.x), Math.round(q.y), +q.d.toFixed(1), q.z, q.si, Math.round(q.v * 1.16), +q.ph.toFixed(2), +q.f.toFixed(2), +q.rot.toFixed(2), q.a];
+        }) }));
+      } catch (e) {}
+      location.href = href;
+    }, 930);
     // si se vuelve con «atrás», el barril está entero otra vez
     addEventListener("pageshow", function () { busy = false; window.__stPause = false; if (coverEl) coverEl.style.opacity = 0; door.classList.remove("boom"); if (cover) { cover.pause(); cover.style.visibility = "hidden"; } if (g) g.clearRect(0, 0, fx.width, fx.height); }, { once: true });
   }
